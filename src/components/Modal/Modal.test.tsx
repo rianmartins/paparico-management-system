@@ -10,11 +10,11 @@ describe('Modal', () => {
   const originalClose = HTMLDialogElement.prototype.close;
 
   beforeEach(() => {
-    HTMLDialogElement.prototype.showModal = vi.fn(function showModal(this: any) {
+    HTMLDialogElement.prototype.showModal = vi.fn(function showModal(this: HTMLDialogElement) {
       this.setAttribute('open', '');
     });
 
-    HTMLDialogElement.prototype.close = vi.fn(function close(this: any) {
+    HTMLDialogElement.prototype.close = vi.fn(function close(this: HTMLDialogElement) {
       this.removeAttribute('open');
     });
   });

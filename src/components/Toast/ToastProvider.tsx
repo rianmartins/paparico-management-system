@@ -21,9 +21,11 @@ export default function ToastProvider({ children }: ToastProviderProps) {
   const timeoutRefs = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
+    const timeouts = timeoutRefs.current;
+
     return () => {
-      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
-      timeoutRefs.current.clear();
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.clear();
     };
   }, []);
 
