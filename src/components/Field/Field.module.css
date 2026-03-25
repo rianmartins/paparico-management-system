@@ -1,0 +1,22 @@
+.Field {
+  display: grid;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.requiredMarker {
+  color: #b42318;
+}
+
+.hint {
+  color: #5a6885;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.errorMessage {
+  color: #b42318;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
