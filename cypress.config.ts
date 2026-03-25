@@ -9,6 +9,7 @@ export default defineConfig({
       bundler: 'vite',
       viteConfig: {
         resolve: {
+          dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
           alias: {
             '@': path.resolve(__dirname, 'src')
           }
