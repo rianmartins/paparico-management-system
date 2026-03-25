@@ -1,13 +1,31 @@
 'use client';
 
+import type { ChangeEventHandler, FocusEventHandler } from 'react';
+
 import Select from '@/components/Select';
 import type { SelectProps } from '@/components/Select';
 import { useFormContext } from 'react-hook-form';
 import type { ChangeHandler, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
 
-function callAll(...handlers: Array<((event: any) => void) | ChangeHandler | undefined>) {
-  return (event: any) => {
-    handlers.forEach((handler) => handler?.(event));
+type RegisteredSelectEvent = Parameters<ChangeHandler>[0];
+
+function createSelectBlurHandler(
+  registrationHandler: ChangeHandler,
+  selectHandler?: FocusEventHandler<HTMLSelectElement>
+): FocusEventHandler<HTMLSelectElement> {
+  return (event) => {
+    registrationHandler(event as unknown as RegisteredSelectEvent);
+    selectHandler?.(event);
+  };
+}
+
+function createSelectChangeHandler(
+  registrationHandler: ChangeHandler,
+  selectHandler?: ChangeEventHandler<HTMLSelectElement>
+): ChangeEventHandler<HTMLSelectElement> {
+  return (event) => {
+    registrationHandler(event as unknown as RegisteredSelectEvent);
+    selectHandler?.(event);
   };
 }
 
@@ -32,8 +50,8 @@ export default function FormSelect<TFieldValues extends FieldValues>({
       {...props}
       {...registration}
       error={error?.message}
-      onBlur={callAll(registration.onBlur, onBlur)}
-      onChange={callAll(registration.onChange, onChange)}
+      onBlur={createSelectBlurHandler(registration.onBlur, onBlur)}
+      onChange={createSelectChangeHandler(registration.onChange, onChange)}
       ref={ref}
     />
   );

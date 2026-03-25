@@ -1,13 +1,31 @@
 'use client';
 
+import type { ChangeEventHandler, FocusEventHandler } from 'react';
+
 import Input from '@/components/Input';
 import type { InputProps } from '@/components/Input';
 import { useFormContext } from 'react-hook-form';
 import type { ChangeHandler, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
 
-function callAll(...handlers: Array<((event: any) => void) | ChangeHandler | undefined>) {
-  return (event: any) => {
-    handlers.forEach((handler) => handler?.(event));
+type RegisteredInputEvent = Parameters<ChangeHandler>[0];
+
+function createInputBlurHandler(
+  registrationHandler: ChangeHandler,
+  inputHandler?: FocusEventHandler<HTMLInputElement>
+): FocusEventHandler<HTMLInputElement> {
+  return (event) => {
+    registrationHandler(event as unknown as RegisteredInputEvent);
+    inputHandler?.(event);
+  };
+}
+
+function createInputChangeHandler(
+  registrationHandler: ChangeHandler,
+  inputHandler?: ChangeEventHandler<HTMLInputElement>
+): ChangeEventHandler<HTMLInputElement> {
+  return (event) => {
+    registrationHandler(event as unknown as RegisteredInputEvent);
+    inputHandler?.(event);
   };
 }
 
@@ -32,8 +50,8 @@ export default function FormInput<TFieldValues extends FieldValues>({
       {...props}
       {...registration}
       error={error?.message}
-      onBlur={callAll(registration.onBlur, onBlur)}
-      onChange={callAll(registration.onChange, onChange)}
+      onBlur={createInputBlurHandler(registration.onBlur, onBlur)}
+      onChange={createInputChangeHandler(registration.onChange, onChange)}
       ref={ref}
     />
   );

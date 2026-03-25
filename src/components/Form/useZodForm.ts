@@ -6,6 +6,7 @@ import type { FieldValues, Resolver, UseFormProps, UseFormReturn } from 'react-h
 import type { z } from 'zod';
 
 type SchemaValues<TSchema extends z.ZodType> = z.infer<TSchema> & FieldValues;
+type ZodResolverSchema = Parameters<typeof zodResolver>[0];
 
 export default function useZodForm<TSchema extends z.ZodType>(
   schema: TSchema,
@@ -13,6 +14,6 @@ export default function useZodForm<TSchema extends z.ZodType>(
 ): UseFormReturn<SchemaValues<TSchema>> {
   return useForm<SchemaValues<TSchema>>({
     ...options,
-    resolver: zodResolver(schema as any) as unknown as Resolver<SchemaValues<TSchema>>
+    resolver: zodResolver(schema as unknown as ZodResolverSchema) as unknown as Resolver<SchemaValues<TSchema>>
   });
 }
