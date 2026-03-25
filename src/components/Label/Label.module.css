@@ -1,0 +1,16 @@
+.Label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #17305f;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .Label {
+    font-size: 0.925rem;
+  }
+}

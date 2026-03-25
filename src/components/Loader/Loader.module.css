@@ -1,0 +1,55 @@
+.Loader {
+  --loader-size: 2rem;
+  --loader-border-width: 0.2rem;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #17305f;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.spinner {
+  width: var(--loader-size);
+  height: var(--loader-size);
+  border: var(--loader-border-width) solid rgba(31, 79, 209, 0.18);
+  border-top-color: #1f4fd1;
+  border-radius: 999px;
+  animation: spin 700ms linear infinite;
+  flex-shrink: 0;
+}
+
+.label {
+  color: #42506d;
+}
+
+.sm {
+  --loader-size: 1.25rem;
+  --loader-border-width: 0.16rem;
+}
+
+.md {
+  --loader-size: 2rem;
+  --loader-border-width: 0.2rem;
+}
+
+.lg {
+  --loader-size: 2.75rem;
+  --loader-border-width: 0.24rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .Loader {
+    gap: 0.625rem;
+    font-size: 0.925rem;
+  }
+}

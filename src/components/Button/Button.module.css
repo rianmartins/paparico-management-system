@@ -1,0 +1,80 @@
+.Button {
+  --button-background: #1f4fd1;
+  --button-border: #1f4fd1;
+  --button-foreground: #ffffff;
+  --button-shadow: rgba(31, 79, 209, 0.24);
+  --button-hover-background: #173da5;
+  --button-hover-border: #173da5;
+  --button-focus-ring: rgba(31, 79, 209, 0.18);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--button-border);
+  border-radius: 0.75rem;
+  background: var(--button-background);
+  box-shadow: 0 0.625rem 1.5rem -1rem var(--button-shadow);
+  color: var(--button-foreground);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--button-hover-background);
+    border-color: var(--button-hover-border);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow:
+      0 0 0 0.25rem var(--button-focus-ring),
+      0 0.625rem 1.5rem -1rem var(--button-shadow);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &.primary {
+    --button-background: #1f4fd1;
+    --button-border: #1f4fd1;
+    --button-foreground: #ffffff;
+    --button-shadow: rgba(31, 79, 209, 0.24);
+    --button-hover-background: #173da5;
+    --button-hover-border: #173da5;
+    --button-focus-ring: rgba(31, 79, 209, 0.18);
+  }
+
+  &.secondary {
+    --button-background: #f6f8ff;
+    --button-border: #cdd8f6;
+    --button-foreground: #17305f;
+    --button-shadow: rgba(23, 48, 95, 0.12);
+    --button-hover-background: #ebf0ff;
+    --button-hover-border: #b9c8ee;
+    --button-focus-ring: rgba(23, 48, 95, 0.16);
+  }
+}
+
+@media (max-width: 640px) {
+  .Button {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.875rem 1rem;
+  }
+}
