@@ -44,7 +44,7 @@ function FormHarness({ onSubmit }: FormHarnessProps) {
         throw new ValidationError({
           status: 422,
           code: 'VALIDATION_ERROR',
-          message: 'Submitted data is invalid.',
+          message: 'Submitted data is invalid. Please try again.',
           details: {
             email: ['Email is already in use.'],
             role: ['Role cannot be assigned.']
