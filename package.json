@@ -21,11 +21,14 @@
     "*.{js,jsx,mjs,cjs,ts,tsx,json,md,mdx,css,scss,yml,yaml}": "prettier --write"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "axios": "^1.13.6",
     "classnames": "^2.5.1",
     "next": "16.2.1",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.72.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -35,7 +38,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.2.0",
-    "cypress": "^14.5.4",
+    "cypress": "^15.10.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "eslint-config-prettier": "^10.1.8",

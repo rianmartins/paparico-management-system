@@ -1,7 +1,8 @@
 import type { ComponentProps, InputHTMLAttributes, ReactNode } from 'react';
-import { useId } from 'react';
+import { forwardRef } from 'react';
 import cx from 'classnames';
 
+import Field from '@/components/Field';
 import Label from '@/components/Label';
 
 import styles from './Input.module.css';
@@ -17,59 +18,49 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   containerClassName?: string;
 };
 
-function buildDescribedByIds(ids: Array<string | undefined>, describedBy?: string) {
-  return [describedBy, ...ids].filter(Boolean).join(' ') || undefined;
-}
-
-export default function Input({
-  'aria-describedby': ariaDescribedBy,
-  'aria-invalid': ariaInvalid,
-  className = '',
-  containerClassName = '',
-  error,
-  hint,
-  id,
-  inputClassName = '',
-  label,
-  labelProps,
-  type = 'text',
-  ...props
-}: InputProps) {
-  const generatedId = useId();
-  const inputId = id ?? generatedId;
-  const hintId = hint ? `${inputId}-hint` : undefined;
-  const errorId = error ? `${inputId}-error` : undefined;
-  const describedBy = buildDescribedByIds([hintId, errorId], ariaDescribedBy);
-  const hasError = Boolean(error);
-
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
+    className = '',
+    containerClassName = '',
+    error,
+    hint,
+    id,
+    inputClassName = '',
+    label,
+    labelProps,
+    required,
+    type = 'text',
+    ...props
+  },
+  ref
+) {
   return (
-    <div className={cx(styles.InputField, containerClassName)}>
-      {label ? (
-        <Label {...labelProps} htmlFor={inputId}>
-          {label}
-        </Label>
-      ) : null}
-
-      <input
-        {...props}
-        aria-describedby={describedBy}
-        aria-invalid={hasError ? true : ariaInvalid}
-        className={cx(styles.Input, { [styles.error]: hasError }, className, inputClassName)}
-        id={inputId}
-        type={type}
-      />
-
-      {hint ? (
-        <p className={styles.hint} id={hintId}>
-          {hint}
-        </p>
-      ) : null}
-
-      {error ? (
-        <p className={styles.errorMessage} id={errorId}>
-          {error}
-        </p>
-      ) : null}
-    </div>
+    <Field
+      aria-describedby={ariaDescribedBy}
+      containerClassName={containerClassName}
+      error={error}
+      hint={hint}
+      id={id}
+      label={label}
+      labelProps={labelProps}
+      required={required}
+    >
+      {({ describedBy, fieldId, hasError }) => (
+        <input
+          {...props}
+          aria-describedby={describedBy}
+          aria-invalid={hasError ? true : ariaInvalid}
+          className={cx(styles.Input, { [styles.error]: hasError }, className, inputClassName)}
+          id={fieldId}
+          ref={ref}
+          required={required}
+          type={type}
+        />
+      )}
+    </Field>
   );
-}
+});
+
+export default Input;
