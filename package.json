@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@tanstack/react-query": "^5.96.0",
     "axios": "^1.13.6",
     "classnames": "^2.5.1",
     "next": "16.2.1",

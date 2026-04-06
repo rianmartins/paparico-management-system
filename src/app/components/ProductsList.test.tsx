@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '@/api/errors';
 import ProductsList from '@/app/components/ProductsList';
 import ProductsService from '@/service/ProductsService';
+import { renderWithQueryClient } from '@/test/renderWithQueryClient';
 import type { Product } from '@/types/Products';
 
 vi.mock('@/service/ProductsService', () => ({
@@ -46,7 +47,7 @@ describe('ProductsList', () => {
   it('renders the loading state before the request resolves', () => {
     mockedListProducts.mockReturnValue(new Promise(() => undefined));
 
-    render(<ProductsList />);
+    renderWithQueryClient(<ProductsList />);
 
     expect(screen.getByText('Loading products...')).toBeInTheDocument();
   });
@@ -54,7 +55,7 @@ describe('ProductsList', () => {
   it('renders products returned by the service', async () => {
     mockedListProducts.mockResolvedValue([productFixture]);
 
-    render(<ProductsList />);
+    renderWithQueryClient(<ProductsList />);
 
     await waitFor(() => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
@@ -67,7 +68,7 @@ describe('ProductsList', () => {
   it('renders the empty state when no products are returned', async () => {
     mockedListProducts.mockResolvedValue([]);
 
-    render(<ProductsList />);
+    renderWithQueryClient(<ProductsList />);
 
     await waitFor(() => {
       expect(screen.getByText('No products available yet.')).toBeInTheDocument();
@@ -83,7 +84,7 @@ describe('ProductsList', () => {
       })
     );
 
-    render(<ProductsList />);
+    renderWithQueryClient(<ProductsList />);
 
     await waitFor(() => {
       expect(screen.getByText('The server could not process the request.')).toBeInTheDocument();
