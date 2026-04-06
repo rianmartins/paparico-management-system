@@ -1,10 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { ApiError } from '@/api/errors';
-import ProductsService from '@/service/ProductsService';
-import type { Product } from '@/types/Products';
+import { useProductsQuery } from '@/features/products';
 
 import styles from '../page.module.css';
 
@@ -20,51 +17,19 @@ function formatIdentifier(value: bigint | string) {
 }
 
 export default function ProductsList() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { data: products = [], error, isPending } = useProductsQuery();
 
-  useEffect(() => {
-    let isMounted = true;
+  let errorMessage: string | null = null;
 
-    async function loadProducts() {
-      try {
-        const productsResponse = await ProductsService.listProducts();
+  if (error instanceof ApiError) {
+    errorMessage = error.message;
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+  } else if (error) {
+    errorMessage = 'Unable to load products right now.';
+  }
 
-        if (!isMounted) {
-          return;
-        }
-
-        setProducts(productsResponse);
-        setErrorMessage(null);
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-
-        const fallbackMessage = 'Unable to load products right now.';
-
-        if (error instanceof ApiError) {
-          setErrorMessage(error.message);
-          return;
-        }
-
-        setErrorMessage(error instanceof Error ? error.message : fallbackMessage);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadProducts();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  if (isLoading) {
+  if (isPending) {
     return <p className={styles.stateMessage}>Loading products...</p>;
   }
 

@@ -42,4 +42,22 @@ export type Product = {
   product_variants: ProductVariant[];
 };
 
+export type ProductOption = {
+  value: string;
+  label: string;
+  disabled?: boolean;
+};
+
+export type ProductTableRow = {
+  id: string;
+  sku: string;
+  name: string;
+  description: string;
+  price: string;
+  status: 'Active' | 'Inactive';
+  variantsCount: number;
+  allowPickup: 'Yes' | 'No';
+  allowInhouse: 'Yes' | 'No';
+};
+
 export type ListProductsResponse = Product[];
