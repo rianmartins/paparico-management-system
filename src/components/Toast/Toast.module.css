@@ -10,10 +10,10 @@
 }
 
 .Toast {
-  --toast-accent: #1f4fd1;
-  --toast-surface: #ffffff;
-  --toast-border: #d8e0f3;
-  --toast-shadow: rgba(12, 32, 84, 0.24);
+  --toast-accent: var(--color-primary);
+  --toast-surface: var(--color-surface-default);
+  --toast-border: var(--color-border-brand-muted);
+  --toast-shadow: var(--color-shadow-cool-md);
 
   pointer-events: auto;
   display: flex;
@@ -25,7 +25,7 @@
   border-radius: 1rem;
   background: var(--toast-surface);
   box-shadow: 0 1.5rem 3rem -2rem var(--toast-shadow);
-  color: #17305f;
+  color: var(--color-text-strong);
 }
 
 .content {
@@ -36,17 +36,17 @@
 }
 
 .title {
-  color: #17305f;
-  font: inherit;
-  font-size: 0.95rem;
+  color: var(--color-text-strong);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-body-sm);
   font-weight: 700;
-  line-height: 1.3;
+  line-height: var(--line-height-compact);
 }
 
 .description {
-  color: #42506d;
-  font-size: 0.92rem;
-  line-height: 1.45;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-toast);
+  line-height: var(--line-height-body);
 }
 
 .closeButton {
@@ -55,13 +55,12 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  border: 1px solid #d5dced;
+  border: 1px solid var(--color-border-muted);
   border-radius: 999px;
-  background: #f8faff;
-  color: #17305f;
-  font: inherit;
-  font-size: 1rem;
-  line-height: 1;
+  background: var(--color-surface-soft);
+  color: var(--color-text-strong);
+  font-size: var(--font-size-icon);
+  line-height: var(--line-height-heading-tight);
   cursor: pointer;
   transition:
     background-color 160ms ease,
@@ -69,38 +68,38 @@
     box-shadow 160ms ease;
 
   &:hover {
-    background: #edf2ff;
-    border-color: #bdc9e8;
+    background: var(--color-surface-soft-hover);
+    border-color: var(--color-border-brand-strong);
   }
 
   &:focus-visible {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(31, 79, 209, 0.14);
+    box-shadow: 0 0 0 0.2rem var(--color-shadow-primary-ring-subtle);
   }
 }
 
 .success {
-  --toast-accent: #0f9f6e;
-  --toast-surface: #f3fdf8;
-  --toast-border: #b8ecd8;
+  --toast-accent: var(--color-success);
+  --toast-surface: var(--color-surface-success);
+  --toast-border: var(--color-border-success);
 }
 
 .error {
-  --toast-accent: #d14343;
-  --toast-surface: #fff7f7;
-  --toast-border: #f0c0c0;
+  --toast-accent: var(--color-border-danger-strong);
+  --toast-surface: var(--color-surface-danger);
+  --toast-border: var(--color-border-danger);
 }
 
 .info {
-  --toast-accent: #1f4fd1;
-  --toast-surface: #f7faff;
-  --toast-border: #d6e1fb;
+  --toast-accent: var(--color-primary);
+  --toast-surface: var(--color-surface-info);
+  --toast-border: var(--color-border-brand-soft);
 }
 
 .warning {
-  --toast-accent: #c17b11;
-  --toast-surface: #fffaf1;
-  --toast-border: #f1dab0;
+  --toast-accent: var(--color-warning);
+  --toast-surface: var(--color-surface-warning);
+  --toast-border: var(--color-border-warning);
 }
 
 .success,

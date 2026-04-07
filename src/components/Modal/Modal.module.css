@@ -6,10 +6,10 @@
   border: none;
   border-radius: 1rem;
   background: transparent;
-  color: #17305f;
+  color: var(--color-text-strong);
 
   &::backdrop {
-    background: rgba(13, 28, 61, 0.46);
+    background: var(--color-modal-backdrop);
     backdrop-filter: blur(0.25rem);
   }
 
@@ -17,31 +17,31 @@
     display: grid;
     gap: 1.25rem;
     padding: 1.5rem;
-    border: 1px solid #d9e1f4;
+    border: 1px solid var(--color-border-default);
     border-radius: 1rem;
-    background: #ffffff;
-    box-shadow: 0 2rem 4rem -2rem rgba(12, 32, 84, 0.4);
+    background: var(--color-surface-default);
+    box-shadow: 0 2rem 4rem -2rem var(--color-shadow-cool-xl);
   }
 
   .header {
     display: flex;
-    align-items: start;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
   }
 
   .title {
-    color: #17305f;
-    font: inherit;
-    font-size: 1.375rem;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-h3-lg);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: var(--line-height-heading);
   }
 
   .body {
-    color: #42506d;
-    font-size: 1rem;
-    line-height: 1.6;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-paragraph);
   }
 
   .footer {
@@ -56,13 +56,12 @@
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
-    border: 1px solid #d5dced;
+    border: 1px solid var(--color-border-muted);
     border-radius: 999px;
-    background: #f8faff;
-    color: #17305f;
-    font: inherit;
-    font-size: 1.25rem;
-    line-height: 1;
+    background: var(--color-surface-soft);
+    color: var(--color-text-strong);
+    font-size: var(--font-size-icon-lg);
+    line-height: var(--line-height-heading-tight);
     cursor: pointer;
     transition:
       background-color 160ms ease,
@@ -71,14 +70,14 @@
       transform 160ms ease;
 
     &:hover {
-      border-color: #bdc9e8;
-      background: #edf2ff;
+      border-color: var(--color-border-brand-strong);
+      background: var(--color-surface-soft-hover);
       transform: translateY(-1px);
     }
 
     &:focus-visible {
       outline: 0;
-      box-shadow: 0 0 0 0.25rem rgba(31, 79, 209, 0.14);
+      box-shadow: 0 0 0 0.25rem var(--color-shadow-primary-ring-subtle);
     }
   }
 }
@@ -95,7 +94,7 @@
   }
 
   .title {
-    font-size: 1.2rem;
+    font-size: var(--font-size-h3);
   }
 
   .footer {

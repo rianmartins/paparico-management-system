@@ -5,18 +5,18 @@
 }
 
 .requiredMarker {
-  color: #b42318;
+  color: var(--color-text-danger);
 }
 
 .hint {
-  color: #5a6885;
-  font-size: 0.875rem;
-  line-height: 1.4;
+  color: var(--color-text-secondary-muted);
+  font-size: var(--font-size-body-xs);
+  line-height: var(--line-height-form);
 }
 
 .errorMessage {
-  color: #b42318;
-  font-size: 0.875rem;
+  color: var(--color-text-danger);
+  font-size: var(--font-size-body-xs);
   font-weight: 500;
-  line-height: 1.4;
+  line-height: var(--line-height-form);
 }
