@@ -1,10 +1,11 @@
 import { screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '@/api/errors';
 import ProductsList from '@/app/components/ProductsList';
 import ProductsService from '@/service/ProductsService';
 import { renderWithQueryClient } from '@/test/renderWithQueryClient';
+import TestErrorBoundary from '@/test/TestErrorBoundary';
 import type { Product } from '@/types/Products';
 
 vi.mock('@/service/ProductsService', () => ({
@@ -42,6 +43,11 @@ const productFixture: Product = {
 describe('ProductsList', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.mocked(console.error).mockRestore();
   });
 
   it('renders the loading state before the request resolves', () => {
@@ -75,7 +81,7 @@ describe('ProductsList', () => {
     });
   });
 
-  it('renders the normalized ApiError message', async () => {
+  it('bubbles failed product requests into the nearest error boundary', async () => {
     mockedListProducts.mockRejectedValue(
       new ApiError({
         status: 500,
@@ -84,10 +90,16 @@ describe('ProductsList', () => {
       })
     );
 
-    renderWithQueryClient(<ProductsList />);
+    renderWithQueryClient(
+      <TestErrorBoundary fallback={<p>Products boundary fallback</p>}>
+        <ProductsList />
+      </TestErrorBoundary>
+    );
 
     await waitFor(() => {
-      expect(screen.getByText('The server could not process the request.')).toBeInTheDocument();
+      expect(screen.getByText('Products boundary fallback')).toBeInTheDocument();
     });
+
+    expect(screen.queryByText('The server could not process the request.')).not.toBeInTheDocument();
   });
 });
