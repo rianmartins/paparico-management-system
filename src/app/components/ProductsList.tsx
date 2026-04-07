@@ -1,6 +1,5 @@
 'use client';
 
-import { ApiError } from '@/api/errors';
 import { useProductsQuery } from '@/features/products';
 
 import styles from '../page.module.css';
@@ -17,24 +16,10 @@ function formatIdentifier(value: bigint | string) {
 }
 
 export default function ProductsList() {
-  const { data: products = [], error, isPending } = useProductsQuery();
-
-  let errorMessage: string | null = null;
-
-  if (error instanceof ApiError) {
-    errorMessage = error.message;
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
-  } else if (error) {
-    errorMessage = 'Unable to load products right now.';
-  }
+  const { data: products = [], isPending } = useProductsQuery();
 
   if (isPending) {
     return <p className={styles.stateMessage}>Loading products...</p>;
-  }
-
-  if (errorMessage) {
-    return <p className={styles.stateMessage}>{errorMessage}</p>;
   }
 
   if (products.length === 0) {

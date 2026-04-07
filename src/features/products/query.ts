@@ -15,7 +15,8 @@ export const productsQueryOptions = queryOptions({
   refetchOnMount: false,
   refetchOnWindowFocus: false,
   refetchOnReconnect: false,
-  retry: false
+  retry: false,
+  throwOnError: true
 });
 
 export type ProductSelector<TData> = (products: ListProductsResponse) => TData;

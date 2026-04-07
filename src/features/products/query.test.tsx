@@ -3,6 +3,7 @@ import { QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ApiError } from '@/api/errors';
 import {
   productsQueryKey,
   selectActiveProducts,
@@ -13,6 +14,7 @@ import {
 import ProductsService from '@/service/ProductsService';
 import { createTestQueryClient } from '@/test/createTestQueryClient';
 import { renderWithQueryClient } from '@/test/renderWithQueryClient';
+import TestErrorBoundary from '@/test/TestErrorBoundary';
 import type { Product } from '@/types/Products';
 
 vi.mock('@/service/ProductsService', () => ({
@@ -165,5 +167,29 @@ describe('products query', () => {
     });
 
     expect(mockedListProducts).toHaveBeenCalledTimes(2);
+  });
+
+  it('throws failed selector queries into the nearest error boundary', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    mockedListProducts.mockRejectedValue(
+      new ApiError({
+        status: 0,
+        code: 'HTTP_0',
+        message: 'The backend is unreachable.'
+      })
+    );
+
+    renderWithQueryClient(
+      <TestErrorBoundary fallback={<p>Products query boundary fallback</p>}>
+        <ActiveProductsConsumer />
+      </TestErrorBoundary>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Products query boundary fallback')).toBeInTheDocument();
+    });
+
+    consoleErrorSpy.mockRestore();
   });
 });
