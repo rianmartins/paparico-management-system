@@ -1,11 +1,11 @@
 .Button {
-  --button-background: #1f4fd1;
-  --button-border: #1f4fd1;
-  --button-foreground: #ffffff;
-  --button-shadow: rgba(31, 79, 209, 0.24);
-  --button-hover-background: #173da5;
-  --button-hover-border: #173da5;
-  --button-focus-ring: rgba(31, 79, 209, 0.18);
+  --button-background: var(--color-primary);
+  --button-border: var(--color-primary);
+  --button-foreground: var(--color-text-inverse);
+  --button-shadow: var(--color-shadow-primary);
+  --button-hover-background: var(--color-primary-hover);
+  --button-hover-border: var(--color-primary-hover);
+  --button-focus-ring: var(--color-shadow-primary-ring);
 
   display: inline-flex;
   align-items: center;
@@ -18,10 +18,10 @@
   background: var(--button-background);
   box-shadow: 0 0.625rem 1.5rem -1rem var(--button-shadow);
   color: var(--button-foreground);
-  font: inherit;
-  font-size: 0.95rem;
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-body-sm);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: var(--line-height-heading);
   text-align: center;
   cursor: pointer;
   transition:
@@ -51,23 +51,23 @@
   }
 
   &.primary {
-    --button-background: #1f4fd1;
-    --button-border: #1f4fd1;
-    --button-foreground: #ffffff;
-    --button-shadow: rgba(31, 79, 209, 0.24);
-    --button-hover-background: #173da5;
-    --button-hover-border: #173da5;
-    --button-focus-ring: rgba(31, 79, 209, 0.18);
+    --button-background: var(--color-primary);
+    --button-border: var(--color-primary);
+    --button-foreground: var(--color-text-inverse);
+    --button-shadow: var(--color-shadow-primary);
+    --button-hover-background: var(--color-primary-hover);
+    --button-hover-border: var(--color-primary-hover);
+    --button-focus-ring: var(--color-shadow-primary-ring);
   }
 
   &.secondary {
-    --button-background: #f6f8ff;
-    --button-border: #cdd8f6;
-    --button-foreground: #17305f;
-    --button-shadow: rgba(23, 48, 95, 0.12);
-    --button-hover-background: #ebf0ff;
-    --button-hover-border: #b9c8ee;
-    --button-focus-ring: rgba(23, 48, 95, 0.16);
+    --button-background: var(--color-surface-brand-muted);
+    --button-border: var(--color-border-brand);
+    --button-foreground: var(--color-text-strong);
+    --button-shadow: var(--color-shadow-primary-ring-xs);
+    --button-hover-background: var(--color-surface-brand-hover);
+    --button-hover-border: var(--color-border-brand-subtle);
+    --button-focus-ring: var(--color-shadow-primary-ring-soft);
   }
 }
 

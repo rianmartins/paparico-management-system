@@ -4,28 +4,28 @@
   display: grid;
   place-items: center;
   background:
-    radial-gradient(circle at top left, rgba(215, 240, 228, 0.92), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(201, 178, 151, 0.18), transparent 32%),
-    linear-gradient(180deg, #f4f1ea 0%, #fcfbf8 100%);
-  color: #1d1d1b;
+    radial-gradient(circle at top left, var(--color-page-radial-strong), transparent 28%),
+    radial-gradient(circle at bottom right, var(--color-page-radial-accent), transparent 32%),
+    linear-gradient(180deg, var(--color-page-gradient-start) 0%, var(--color-page-gradient-end) 100%);
+  color: var(--color-text-base);
 }
 
 .panel {
   width: min(100%, 900px);
   padding: clamp(28px, 4vw, 48px);
-  border: 1px solid rgba(29, 29, 27, 0.08);
+  border: 1px solid var(--color-border-contrast);
   border-radius: 32px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 30px 90px rgba(87, 74, 55, 0.12);
+  background: var(--color-surface-elevated);
+  box-shadow: 0 30px 90px var(--color-shadow-warm-xl);
 }
 
 .eyebrow {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: var(--font-size-body-3xs);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--letter-spacing-label-wide);
   text-transform: uppercase;
-  color: #7f5a3a;
+  color: var(--color-text-accent);
 }
 
 .content {
@@ -36,24 +36,24 @@
 
 .kicker {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--font-size-kicker);
   font-weight: 600;
-  color: #8c6b4a;
+  color: var(--color-text-accent-soft);
 }
 
 .copy h1 {
   margin: 10px 0 0;
-  font-size: clamp(2.4rem, 6vw, 4rem);
-  line-height: 0.95;
-  letter-spacing: -0.06em;
+  font-size: var(--font-size-h1-compact);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
 }
 
 .description {
   max-width: 52rem;
   margin: 18px 0 0;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: #5a5a54;
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-paragraph-relaxed);
+  color: var(--color-text-body);
 }
 
 .actions {
@@ -70,7 +70,8 @@
   min-height: 48px;
   padding: 0 20px;
   border-radius: 999px;
-  font-size: 0.98rem;
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-body-emphasis);
   font-weight: 700;
   transition:
     transform 160ms ease,
@@ -81,10 +82,10 @@
 
 .primaryAction {
   border: 0;
-  background: #1d1d1b;
-  color: #fff;
+  background: var(--color-text-base);
+  color: var(--color-text-inverse);
   cursor: pointer;
-  box-shadow: 0 18px 36px rgba(29, 29, 27, 0.18);
+  box-shadow: 0 18px 36px var(--color-shadow-contrast);
 
   &:hover {
     transform: translateY(-1px);
@@ -93,24 +94,24 @@
   &:focus-visible {
     outline: 0;
     box-shadow:
-      0 18px 36px rgba(29, 29, 27, 0.18),
-      0 0 0 0.2rem rgba(29, 29, 27, 0.12);
+      0 18px 36px var(--color-shadow-contrast),
+      0 0 0 0.2rem var(--color-shadow-contrast-ring);
   }
 }
 
 .secondaryAction {
-  border: 1px solid rgba(29, 29, 27, 0.12);
-  background: rgba(255, 255, 255, 0.8);
-  color: #1d1d1b;
+  border: 1px solid var(--color-border-contrast-strong);
+  background: var(--color-surface-overlay);
+  color: var(--color-text-base);
 
   &:hover {
     transform: translateY(-1px);
-    border-color: rgba(29, 29, 27, 0.18);
+    border-color: var(--color-border-contrast-hover);
   }
 
   &:focus-visible {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(29, 29, 27, 0.1);
+    box-shadow: 0 0 0 0.2rem var(--color-shadow-contrast-ring-soft);
   }
 }
 
@@ -121,11 +122,11 @@
 
 .diagnosticTitle {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: var(--font-size-body-2xs);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
-  color: #8b8b83;
+  color: var(--color-text-label);
 }
 
 .diagnostics {
@@ -137,24 +138,24 @@
 .diagnosticCard {
   padding: 16px;
   border-radius: 18px;
-  background: rgba(244, 241, 234, 0.92);
+  background: var(--color-surface-warm-strong);
 }
 
 .diagnosticCard dt {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: var(--font-size-label-sm);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--letter-spacing-caption);
   text-transform: uppercase;
-  color: #8b8b83;
+  color: var(--color-text-label);
 }
 
 .diagnosticCard dd {
   margin: 8px 0 0;
-  color: #1d1d1b;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.94rem;
-  line-height: 1.5;
+  color: var(--color-text-base);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-sm-alt);
+  line-height: var(--line-height-code);
   word-break: break-word;
 }
 
@@ -162,9 +163,9 @@
   margin: 0;
   padding: 16px 18px;
   border-radius: 18px;
-  background: rgba(244, 241, 234, 0.92);
-  color: #5a5a54;
-  line-height: 1.6;
+  background: var(--color-surface-warm-strong);
+  color: var(--color-text-body);
+  line-height: var(--line-height-paragraph);
 }
 
 @media (max-width: 640px) {
