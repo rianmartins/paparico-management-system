@@ -1,11 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 
+import { hasStoredSession, subscribeToStoredSession } from '@/auth/session';
 import { ToastProvider } from '@/components/Toast';
-import { productsQueryOptions } from '@/features/products';
+import { productsQueryKey, productsQueryOptions } from '@/features/products';
 
 export type AppProvidersProps = {
   children: ReactNode;
@@ -17,10 +18,16 @@ function createQueryClient() {
 
 function ProductsQueryWarmup() {
   const queryClient = useQueryClient();
+  const isAuthenticated = useSyncExternalStore(subscribeToStoredSession, hasStoredSession, () => false);
 
   useEffect(() => {
-    void queryClient.prefetchQuery(productsQueryOptions);
-  }, [queryClient]);
+    if (isAuthenticated) {
+      void queryClient.prefetchQuery(productsQueryOptions);
+      return;
+    }
+
+    queryClient.removeQueries({ queryKey: productsQueryKey });
+  }, [isAuthenticated, queryClient]);
 
   return null;
 }

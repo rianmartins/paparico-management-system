@@ -1,11 +1,9 @@
-import { getApiClient } from '@/api/client';
+import { getAxiosClient } from '@/api/axiosClient';
 import type { ListProductsResponse } from '@/types/Products';
 
 export class ProductsAPI {
-  private readonly client = getApiClient();
-
   async listProducts(): Promise<ListProductsResponse> {
-    const response = await this.client.get<ListProductsResponse>('/products');
+    const response = await getAxiosClient().get<ListProductsResponse>('/products');
 
     return response.data;
   }

@@ -59,6 +59,10 @@ export class NetworkError extends ApiError {
   }
 }
 
+export function isUnauthorizedApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError && error.status === 401;
+}
+
 const FALLBACK_MESSAGES = {
   default: 'An unexpected API error occurred.',
   badRequest: 'The request could not be processed.',

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AppProviders from '@/app/providers';
+import { clearStoredSession, persistSession } from '@/auth/session';
 import { useProductsValue } from '@/features/products';
 import ProductsService from '@/service/ProductsService';
 import type { Product } from '@/types/Products';
@@ -61,10 +62,35 @@ function DelayedProductConsumer() {
 describe('AppProviders', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
+    clearStoredSession();
   });
 
-  it('warms the products query once during app load', async () => {
+  it('does not prefetch protected product data before a consumer asks for it', async () => {
     mockedListProducts.mockResolvedValue([productFixture]);
+
+    render(
+      <AppProviders>
+        <DelayedProductConsumer />
+      </AppProviders>
+    );
+
+    expect(mockedListProducts).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show products' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
+    });
+
+    expect(mockedListProducts).toHaveBeenCalledTimes(1);
+  });
+
+  it('warms the products query once after an authenticated session is available', async () => {
+    mockedListProducts.mockResolvedValue([productFixture]);
+    persistSession({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token'
+    });
 
     render(
       <AppProviders>
