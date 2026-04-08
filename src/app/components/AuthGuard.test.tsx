@@ -6,14 +6,12 @@ import { clearStoredSession, persistSession } from '@/auth/session';
 
 const routerReplaceMock = vi.fn();
 const usePathnameMock = vi.fn();
-const useSearchParamsMock = vi.fn();
 
 vi.mock('next/navigation', () => ({
   usePathname: () => usePathnameMock(),
   useRouter: () => ({
     replace: routerReplaceMock
-  }),
-  useSearchParams: () => useSearchParamsMock()
+  })
 }));
 
 function renderGuard() {
@@ -29,12 +27,12 @@ describe('AuthGuard', () => {
     clearStoredSession();
     routerReplaceMock.mockReset();
     usePathnameMock.mockReset();
-    useSearchParamsMock.mockReset();
+    window.history.replaceState({}, '', '/');
   });
 
   it('redirects unauthenticated protected routes to login with redirects_to', async () => {
     usePathnameMock.mockReturnValue('/products');
-    useSearchParamsMock.mockReturnValue(new URLSearchParams());
+    window.history.replaceState({}, '', '/products');
 
     renderGuard();
 
@@ -45,13 +43,24 @@ describe('AuthGuard', () => {
     expect(screen.queryByText('Protected content')).not.toBeInTheDocument();
   });
 
+  it('preserves the current query string when redirecting to login', async () => {
+    usePathnameMock.mockReturnValue('/products');
+    window.history.replaceState({}, '', '/products?tab=active');
+
+    renderGuard();
+
+    await waitFor(() => {
+      expect(routerReplaceMock).toHaveBeenCalledWith('/?redirects_to=%2Fproducts%3Ftab%3Dactive');
+    });
+  });
+
   it('redirects authenticated visits from login to the requested page', async () => {
     persistSession({
       accessToken: 'access-token',
       refreshToken: 'refresh-token'
     });
     usePathnameMock.mockReturnValue('/');
-    useSearchParamsMock.mockReturnValue(new URLSearchParams('redirects_to=%2Fproducts%3Ftab%3Dactive'));
+    window.history.replaceState({}, '', '/?redirects_to=%2Fproducts%3Ftab%3Dactive');
 
     renderGuard();
 
@@ -66,7 +75,7 @@ describe('AuthGuard', () => {
       refreshToken: 'refresh-token'
     });
     usePathnameMock.mockReturnValue('/products');
-    useSearchParamsMock.mockReturnValue(new URLSearchParams());
+    window.history.replaceState({}, '', '/products');
 
     renderGuard();
 

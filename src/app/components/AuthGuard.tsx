@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useSyncExternalStore } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { getLoginHref, hasStoredSession, sanitizeNextPath, subscribeToStoredSession } from '@/auth/session';
 
@@ -10,19 +10,30 @@ export type AuthGuardProps = {
   children: ReactNode;
 };
 
-function buildCurrentPath(pathname: string, searchParams: ReturnType<typeof useSearchParams>) {
-  const queryString = searchParams.toString();
+function buildCurrentPath(pathname: string) {
+  if (typeof window === 'undefined') {
+    return pathname;
+  }
 
+  const queryString = window.location.search.slice(1);
   return queryString.length > 0 ? `${pathname}?${queryString}` : pathname;
+}
+
+function getRedirectTargetFromLocation() {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  const searchParams = new URLSearchParams(window.location.search);
+
+  return sanitizeNextPath(searchParams.get('redirects_to') ?? undefined);
 }
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const isAuthenticated = useSyncExternalStore(subscribeToStoredSession, hasStoredSession, () => false);
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const isLoginRoute = pathname === '/';
-  const redirectsTo = sanitizeNextPath(searchParams.get('redirects_to') ?? undefined);
 
   useEffect(() => {
     if (!pathname) {
@@ -30,14 +41,14 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
 
     if (!isAuthenticated && !isLoginRoute) {
-      router.replace(getLoginHref(buildCurrentPath(pathname, searchParams)));
+      router.replace(getLoginHref(buildCurrentPath(pathname)));
       return;
     }
 
     if (isAuthenticated && isLoginRoute) {
-      router.replace(redirectsTo ?? '/products');
+      router.replace(getRedirectTargetFromLocation() ?? '/products');
     }
-  }, [isAuthenticated, isLoginRoute, pathname, redirectsTo, router, searchParams]);
+  }, [isAuthenticated, isLoginRoute, pathname, router]);
 
   if ((!isAuthenticated && !isLoginRoute) || (isAuthenticated && isLoginRoute)) {
     return null;
