@@ -1,8 +1,7 @@
 import { ServerError } from '@/api/errors';
 import { getAxiosClient } from '@/api/axiosClient';
-import { clearStoredSession, getStoredSession, persistSession } from '@/auth/session';
-import type { LoginValues } from '@/features/auth/login';
-import type { AuthSession, LoginResponsePayload } from '@/types/Auth';
+import { clearStoredSession, getStoredSession, persistSession } from '@/features/Auth/session';
+import type { AuthSession, LoginCredentials, LoginResponsePayload } from '@/types/Auth';
 
 function extractSession(payload: LoginResponsePayload): AuthSession {
   if (
@@ -28,7 +27,7 @@ function extractSession(payload: LoginResponsePayload): AuthSession {
 }
 
 export class AuthAPI {
-  async login(credentials: LoginValues) {
+  async login(credentials: LoginCredentials) {
     const response = await getAxiosClient().post<LoginResponsePayload>('/auth/login', credentials);
     const session = extractSession(response.data);
 

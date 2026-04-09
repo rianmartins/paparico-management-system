@@ -8,9 +8,9 @@ import {
   hasStoredSession,
   persistSession,
   sanitizeNextPath
-} from '@/auth/session';
+} from './session';
 
-describe('auth/session', () => {
+describe('features/Auth/session', () => {
   beforeEach(() => {
     window.localStorage.clear();
   });

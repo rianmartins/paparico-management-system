@@ -2,19 +2,21 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import ProductsAPI from '@/api/ProductsAPI';
 import AppProviders from '@/app/providers';
-import { clearStoredSession, persistSession } from '@/auth/session';
-import { useProductsValue } from '@/features/products';
-import ProductsService from '@/service/ProductsService';
+import { clearStoredSession, persistSession } from '@/features/Auth/session';
+import { useProductsValue } from '@/features/Products';
 import type { Product } from '@/types/Products';
 
-vi.mock('@/service/ProductsService', () => ({
+import AppWarmup from './AppWarmup';
+
+vi.mock('@/api/ProductsAPI', () => ({
   default: {
     listProducts: vi.fn()
   }
 }));
 
-const mockedListProducts = vi.mocked(ProductsService.listProducts);
+const mockedListProducts = vi.mocked(ProductsAPI.listProducts);
 
 const productFixture: Product = {
   id: '1',
@@ -59,7 +61,7 @@ function DelayedProductConsumer() {
   );
 }
 
-describe('AppProviders', () => {
+describe('AppWarmup', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
     clearStoredSession();
@@ -70,6 +72,7 @@ describe('AppProviders', () => {
 
     render(
       <AppProviders>
+        <AppWarmup />
         <DelayedProductConsumer />
       </AppProviders>
     );
@@ -94,6 +97,7 @@ describe('AppProviders', () => {
 
     render(
       <AppProviders>
+        <AppWarmup />
         <DelayedProductConsumer />
       </AppProviders>
     );

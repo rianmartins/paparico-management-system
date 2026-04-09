@@ -1,8 +1,8 @@
 'use client';
 
-import { useProductsQuery } from '@/features/products';
+import { useProductsQuery } from './query';
 
-import styles from '../page.module.css';
+import styles from './ProductList.module.css';
 
 function formatPrice(basePriceCents: number) {
   return new Intl.NumberFormat('pt-PT', {
@@ -15,7 +15,7 @@ function formatIdentifier(value: bigint | string) {
   return String(value);
 }
 
-export default function ProductsList() {
+export default function ProductList() {
   const { data: products = [], isPending } = useProductsQuery();
 
   if (isPending) {

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '@/api/errors';
-import ErrorPage from '@/app/components/ErrorPage';
+import ErrorPage from '@/components/ErrorPage';
 
 describe('ErrorPage', () => {
   it('renders branded safe diagnostics and retries through the provided action', () => {
@@ -18,6 +18,7 @@ describe('ErrorPage', () => {
             message: 'The server could not process the request.'
           })
         }
+        eyebrow="Paparico Management"
         onRetry={onRetry}
       />
     );

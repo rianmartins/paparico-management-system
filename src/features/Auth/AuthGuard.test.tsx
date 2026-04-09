@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import AuthGuard from '@/app/components/AuthGuard';
-import { clearStoredSession, persistSession } from '@/auth/session';
+import { clearStoredSession, persistSession } from './session';
+
+import AuthGuard from './AuthGuard';
 
 const routerReplaceMock = vi.fn();
 const usePathnameMock = vi.fn();

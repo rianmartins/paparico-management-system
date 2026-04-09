@@ -4,8 +4,7 @@ import type { ReactNode } from 'react';
 
 import type { ErrorPageContext } from '@/types/ErrorPage';
 
-import { appName } from '../branding';
-import { normalizeErrorForDisplay } from '../error-utils';
+import { normalizeErrorForDisplay } from './normalizeErrorForDisplay';
 import styles from './ErrorPage.module.css';
 
 export type ErrorPageProps = {
@@ -14,6 +13,7 @@ export type ErrorPageProps = {
   context?: ErrorPageContext;
   homeHref?: string;
   homeLabel?: ReactNode;
+  eyebrow?: ReactNode;
 };
 
 export default function ErrorPage({
@@ -21,14 +21,15 @@ export default function ErrorPage({
   onRetry,
   context,
   homeHref = '/',
-  homeLabel = 'Back to dashboard'
+  homeLabel = 'Back to dashboard',
+  eyebrow = 'Application error'
 }: ErrorPageProps) {
   const { title, description, diagnostics } = normalizeErrorForDisplay(error, context);
 
   return (
     <main className={styles.page}>
       <section aria-live="assertive" className={styles.panel} role="alert">
-        <p className={styles.eyebrow}>{appName}</p>
+        <p className={styles.eyebrow}>{eyebrow}</p>
 
         <div className={styles.content}>
           <div className={styles.copy}>

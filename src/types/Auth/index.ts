@@ -4,6 +4,11 @@ export type AuthUser = {
   roles: string[];
 };
 
+export type LoginCredentials = {
+  email: string;
+  password: string;
+};
+
 export type AuthSession = {
   accessToken: string;
   refreshToken: string;

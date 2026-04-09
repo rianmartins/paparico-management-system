@@ -2,7 +2,7 @@ import ProductsAPI from '@/api/ProductsAPI';
 import type { ListProductsResponse } from '@/types/Products';
 
 export class ProductsService {
-  async listProducts(): Promise<ListProductsResponse> {
+  async loadProducts(): Promise<ListProductsResponse> {
     return ProductsAPI.listProducts();
   }
 }

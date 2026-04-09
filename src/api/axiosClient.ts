@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders } from 'axios';
 
 import { isUnauthorizedApiError, normalizeApiError } from '@/api/errors';
-import { clearStoredSession, getStoredSession } from '@/auth/session';
+import { clearStoredSession, getStoredSession } from '@/features/Auth/session';
 
 function getApiBaseUrl() {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;

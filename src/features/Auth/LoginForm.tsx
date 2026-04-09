@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import AuthAPI from '@/api/AuthAPI';
 import Button from '@/components/Button';
 import Form, { FormErrorSummary, FormInput, applyFormApiErrors, useZodForm } from '@/components/Form';
-import { type LoginValues, loginSchema } from '@/features/auth/login';
 import useToast from '@/hooks/useToast';
+import type { LoginCredentials } from '@/types/Auth';
 
-import styles from '../page.module.css';
+import { loginSchema } from './schema';
+import styles from './LoginForm.module.css';
 
 export type LoginFormProps = {
   redirectsTo?: string;
@@ -24,7 +25,7 @@ export default function LoginForm({ redirectsTo }: LoginFormProps) {
   const router = useRouter();
   const toast = useToast();
 
-  const handleSubmit = async (values: LoginValues) => {
+  const handleSubmit = async (values: LoginCredentials) => {
     form.clearErrors('root');
 
     try {
@@ -52,7 +53,7 @@ export default function LoginForm({ redirectsTo }: LoginFormProps) {
 
         <Form className={styles.loginForm} form={form} onSubmit={handleSubmit}>
           <div className={styles.loginFields}>
-            <FormInput<LoginValues>
+            <FormInput<LoginCredentials>
               autoComplete="email"
               hint="Use the email address registered for your Paparico access."
               label="Email"
@@ -60,7 +61,7 @@ export default function LoginForm({ redirectsTo }: LoginFormProps) {
               placeholder="manager@paparico.pt"
               type="email"
             />
-            <FormInput<LoginValues>
+            <FormInput<LoginCredentials>
               autoComplete="current-password"
               hint="Your password is never stored in the browser."
               label="Password"

@@ -3,27 +3,23 @@ import { QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import ProductsAPI from '@/api/ProductsAPI';
 import { ApiError } from '@/api/errors';
-import {
-  productsQueryKey,
-  selectActiveProducts,
-  selectProductOptions,
-  selectProductsTableRows,
-  useProductsValue
-} from '@/features/products';
-import ProductsService from '@/service/ProductsService';
+import { selectActiveProducts, selectProductOptions, selectProductsTableRows } from '@/services/ProductsService';
 import { createTestQueryClient } from '@/test/createTestQueryClient';
 import { renderWithQueryClient } from '@/test/renderWithQueryClient';
 import TestErrorBoundary from '@/test/TestErrorBoundary';
 import type { Product } from '@/types/Products';
 
-vi.mock('@/service/ProductsService', () => ({
+import { productsQueryKey, useProductsValue } from './query';
+
+vi.mock('@/api/ProductsAPI', () => ({
   default: {
     listProducts: vi.fn()
   }
 }));
 
-const mockedListProducts = vi.mocked(ProductsService.listProducts);
+const mockedListProducts = vi.mocked(ProductsAPI.listProducts);
 
 const activeProductFixture: Product = {
   id: '1',

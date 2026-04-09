@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 
-import ErrorPage from './components/ErrorPage';
+import ErrorPage from '@/components/ErrorPage';
+
+import { appName } from './branding';
 
 type AppErrorProps = {
   error: Error & { digest?: string };
@@ -23,6 +25,7 @@ export default function Error({ error, unstable_retry }: AppErrorProps) {
     <ErrorPage
       context={pathname ? { label: 'Route', value: pathname } : undefined}
       error={error}
+      eyebrow={appName}
       onRetry={() => {
         reset();
         unstable_retry();

@@ -15,7 +15,8 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "precommit": "lint-staged",
-    "prepare": "husky"
+    "prepare": "husky",
+    "ts": "npx tsc --noEmit"
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs,ts,tsx,json,md,mdx,css,scss,yml,yaml}": "prettier --write"

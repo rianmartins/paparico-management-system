@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useSyncExternalStore } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { getLoginHref, hasStoredSession, sanitizeNextPath, subscribeToStoredSession } from '@/auth/session';
+import { getLoginHref, hasStoredSession, sanitizeNextPath, subscribeToStoredSession } from './session';
 
 export type AuthGuardProps = {
   children: ReactNode;

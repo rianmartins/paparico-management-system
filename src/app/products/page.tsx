@@ -1,7 +1,7 @@
-import LogoutButton from '@/app/components/LogoutButton';
+import LogoutButton from '@/features/Auth/LogoutButton';
+import ProductList from '@/features/Products/ProductList';
 
-import ProductsList from '../components/ProductsList';
-import styles from '../page.module.css';
+import styles from './page.module.css';
 
 export default function ProductsPage() {
   return (
@@ -28,7 +28,7 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <ProductsList />
+          <ProductList />
         </section>
       </main>
     </div>

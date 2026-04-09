@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AuthAPI from '@/api/AuthAPI';
 import { getAxiosClient } from '@/api/axiosClient';
-import { AUTH_SESSION_STORAGE_KEY } from '@/auth/session';
 import { ValidationError } from '@/api/errors';
+import { AUTH_SESSION_STORAGE_KEY } from '@/features/Auth/session';
 
 vi.mock('@/api/axiosClient', () => ({
   getAxiosClient: vi.fn()

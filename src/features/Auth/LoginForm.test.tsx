@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AuthAPI from '@/api/AuthAPI';
 import { ValidationError } from '@/api/errors';
-import LoginForm from '@/app/components/LoginForm';
 import ToastProvider from '@/components/Toast/ToastProvider';
+
+import LoginForm from './LoginForm';
 
 const routerReplaceMock = vi.fn();
 const routerRefreshMock = vi.fn();
