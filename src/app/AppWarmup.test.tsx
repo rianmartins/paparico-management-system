@@ -2,10 +2,12 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import AuthAPI from '@/api/AuthAPI';
 import ProductsAPI from '@/api/ProductsAPI';
 import AppProviders from '@/app/providers';
-import { clearStoredSession, persistSession } from '@/features/Auth/session';
+import { clearStoredSession, getStoredUser, persistSession } from '@/features/Auth/session';
 import { useProductsValue } from '@/features/Products';
+import type { AuthUser } from '@/types/Auth';
 import type { Product } from '@/types/Products';
 
 import AppWarmup from './AppWarmup';
@@ -16,7 +18,22 @@ vi.mock('@/api/ProductsAPI', () => ({
   }
 }));
 
+vi.mock('@/api/AuthAPI', () => ({
+  default: {
+    me: vi.fn()
+  }
+}));
+
 const mockedListProducts = vi.mocked(ProductsAPI.listProducts);
+const mockedMe = vi.mocked(AuthAPI.me);
+
+const authUserFixture: AuthUser = {
+  id: '1',
+  email: 'manager@paparico.pt',
+  roles: ['admin'],
+  name: 'Paparico Manager',
+  require_password_update: false
+};
 
 const productFixture: Product = {
   id: '1',
@@ -64,6 +81,7 @@ function DelayedProductConsumer() {
 describe('AppWarmup', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
+    mockedMe.mockReset();
     clearStoredSession();
   });
 
@@ -78,6 +96,7 @@ describe('AppWarmup', () => {
     );
 
     expect(mockedListProducts).not.toHaveBeenCalled();
+    expect(mockedMe).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'Show products' }));
 
@@ -86,10 +105,12 @@ describe('AppWarmup', () => {
     });
 
     expect(mockedListProducts).toHaveBeenCalledTimes(1);
+    expect(mockedMe).not.toHaveBeenCalled();
   });
 
-  it('warms the products query once after an authenticated session is available', async () => {
+  it('warms the products and current user queries once after an authenticated session is available', async () => {
     mockedListProducts.mockResolvedValue([productFixture]);
+    mockedMe.mockResolvedValue(authUserFixture);
     persistSession({
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
@@ -105,6 +126,13 @@ describe('AppWarmup', () => {
 
     await waitFor(() => {
       expect(mockedListProducts).toHaveBeenCalledTimes(1);
+      expect(mockedMe).toHaveBeenCalledTimes(1);
+    });
+    expect(getStoredUser()).toEqual({
+      id: '1',
+      email: 'manager@paparico.pt',
+      roles: ['admin'],
+      name: 'Paparico Manager'
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Show products' }));
@@ -114,5 +142,6 @@ describe('AppWarmup', () => {
     });
 
     expect(mockedListProducts).toHaveBeenCalledTimes(1);
+    expect(mockedMe).toHaveBeenCalledTimes(1);
   });
 });

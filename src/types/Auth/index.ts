@@ -3,6 +3,7 @@ export type AuthUser = {
   email: string;
   roles: string[];
   require_password_update?: boolean;
+  name: string | null;
 };
 
 export type LoginCredentials = {
@@ -14,6 +15,7 @@ export type AuthSession = {
   accessToken: string;
   refreshToken: string;
   requirePasswordUpdate: boolean;
+  user?: AuthUser;
 };
 
 export type LoginResponsePayload = {
