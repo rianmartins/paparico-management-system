@@ -92,7 +92,8 @@ describe('AppWarmup', () => {
     mockedListProducts.mockResolvedValue([productFixture]);
     persistSession({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
     });
 
     render(

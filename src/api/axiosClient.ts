@@ -1,7 +1,18 @@
 import axios, { AxiosHeaders } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 import { isUnauthorizedApiError, normalizeApiError } from '@/api/errors';
 import { clearStoredSession, getStoredSession } from '@/features/Auth/session';
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipUnauthorizedSessionClear?: boolean;
+  }
+}
+
+type SessionAwareRequestConfig = AxiosRequestConfig & {
+  skipUnauthorizedSessionClear?: boolean;
+};
 
 function getApiBaseUrl() {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -34,12 +45,26 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
+function shouldClearStoredSession(normalizedError: unknown, originalError: unknown) {
+  if (!isUnauthorizedApiError(normalizedError)) {
+    return false;
+  }
+
+  if (axios.isAxiosError(originalError)) {
+    const requestConfig = originalError.config as SessionAwareRequestConfig | undefined;
+
+    return requestConfig?.skipUnauthorizedSessionClear !== true;
+  }
+
+  return true;
+}
+
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const normalizedError = normalizeApiError(error);
 
-    if (isUnauthorizedApiError(normalizedError)) {
+    if (shouldClearStoredSession(normalizedError, error)) {
       clearStoredSession();
     }
 

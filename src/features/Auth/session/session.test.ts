@@ -6,7 +6,9 @@ import {
   getLoginHref,
   getStoredSession,
   hasStoredSession,
+  markPasswordUpdateComplete,
   persistSession,
+  requiresPasswordUpdate,
   sanitizeNextPath
 } from './session';
 
@@ -18,26 +20,65 @@ describe('features/Auth/session', () => {
   it('persists a session in local storage and reads it back', () => {
     persistSession({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: true
     });
 
     expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBe(
       JSON.stringify({
         accessToken: 'access-token',
-        refreshToken: 'refresh-token'
+        refreshToken: 'refresh-token',
+        requirePasswordUpdate: true
       })
     );
     expect(getStoredSession()).toEqual({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: true
     });
     expect(hasStoredSession()).toBe(true);
+    expect(requiresPasswordUpdate()).toBe(true);
+  });
+
+  it('defaults older stored sessions to no required password update', () => {
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token'
+      })
+    );
+
+    expect(getStoredSession()).toEqual({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
+    });
+    expect(requiresPasswordUpdate()).toBe(false);
+  });
+
+  it('marks the required password update as complete', () => {
+    persistSession({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: true
+    });
+
+    markPasswordUpdateComplete();
+
+    expect(getStoredSession()).toEqual({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
+    });
+    expect(requiresPasswordUpdate()).toBe(false);
   });
 
   it('clears the stored session', () => {
     persistSession({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
     });
 
     clearStoredSession();

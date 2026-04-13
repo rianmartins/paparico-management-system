@@ -53,7 +53,8 @@ describe('LoginForm', () => {
   it('submits credentials and redirects to the requested path', async () => {
     mockedLogin.mockResolvedValue({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
     });
 
     renderLoginForm('/products?tab=active');

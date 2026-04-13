@@ -4,7 +4,14 @@ import type { ReactNode } from 'react';
 import { useEffect, useSyncExternalStore } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { getLoginHref, hasStoredSession, sanitizeNextPath, subscribeToStoredSession } from './session';
+import RequiredPasswordUpdateModal from './RequiredPasswordUpdateModal';
+import {
+  getLoginHref,
+  hasStoredSession,
+  requiresPasswordUpdate,
+  sanitizeNextPath,
+  subscribeToStoredSession
+} from './session';
 
 export type AuthGuardProps = {
   children: ReactNode;
@@ -31,6 +38,7 @@ function getRedirectTargetFromLocation() {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const isAuthenticated = useSyncExternalStore(subscribeToStoredSession, hasStoredSession, () => false);
+  const isPasswordUpdateRequired = useSyncExternalStore(subscribeToStoredSession, requiresPasswordUpdate, () => false);
   const pathname = usePathname();
   const router = useRouter();
   const isLoginRoute = pathname === '/';
@@ -54,5 +62,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {isAuthenticated && !isLoginRoute && isPasswordUpdateRequired ? (
+        <RequiredPasswordUpdateModal isOpen={isPasswordUpdateRequired} />
+      ) : null}
+    </>
+  );
 }
