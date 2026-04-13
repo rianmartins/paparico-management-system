@@ -2,18 +2,21 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import ProductsAPI from '@/api/ProductsAPI';
 import AppProviders from '@/app/providers';
-import { useProductsValue } from '@/features/products';
-import ProductsService from '@/service/ProductsService';
+import { clearStoredSession, persistSession } from '@/features/Auth/session';
+import { useProductsValue } from '@/features/Products';
 import type { Product } from '@/types/Products';
 
-vi.mock('@/service/ProductsService', () => ({
+import AppWarmup from './AppWarmup';
+
+vi.mock('@/api/ProductsAPI', () => ({
   default: {
     listProducts: vi.fn()
   }
 }));
 
-const mockedListProducts = vi.mocked(ProductsService.listProducts);
+const mockedListProducts = vi.mocked(ProductsAPI.listProducts);
 
 const productFixture: Product = {
   id: '1',
@@ -58,16 +61,43 @@ function DelayedProductConsumer() {
   );
 }
 
-describe('AppProviders', () => {
+describe('AppWarmup', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
+    clearStoredSession();
   });
 
-  it('warms the products query once during app load', async () => {
+  it('does not prefetch protected product data before a consumer asks for it', async () => {
     mockedListProducts.mockResolvedValue([productFixture]);
 
     render(
       <AppProviders>
+        <AppWarmup />
+        <DelayedProductConsumer />
+      </AppProviders>
+    );
+
+    expect(mockedListProducts).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show products' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
+    });
+
+    expect(mockedListProducts).toHaveBeenCalledTimes(1);
+  });
+
+  it('warms the products query once after an authenticated session is available', async () => {
+    mockedListProducts.mockResolvedValue([productFixture]);
+    persistSession({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token'
+    });
+
+    render(
+      <AppProviders>
+        <AppWarmup />
         <DelayedProductConsumer />
       </AppProviders>
     );

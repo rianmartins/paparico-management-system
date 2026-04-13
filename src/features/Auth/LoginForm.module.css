@@ -1,0 +1,63 @@
+.loginGrid {
+  display: grid;
+  min-height: 100%;
+  text-align: center;
+}
+
+.loginCard {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: auto;
+  align-self: center;
+  gap: 20px;
+  padding: 32px;
+  border-radius: 28px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-contrast);
+  box-shadow: 0 18px 60px var(--color-shadow-warm-md);
+}
+
+.loginHeader {
+  display: grid;
+  gap: 10px;
+}
+
+.loginHeader h2 {
+  margin: 6px 0 0;
+  font-size: var(--font-size-h2);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--font-size-label);
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  color: var(--color-text-accent);
+}
+
+.loginCopy {
+  margin: 0;
+  color: var(--color-text-subtle);
+}
+
+.loginForm {
+  display: grid;
+  gap: 16px;
+}
+
+.loginFields {
+  display: grid;
+  gap: 16px;
+}
+
+.loginSubmit {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .loginCard {
+    padding: 20px;
+  }
+}

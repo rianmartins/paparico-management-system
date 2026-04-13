@@ -2,8 +2,9 @@
 
 import { useEffect } from 'react';
 
+import ErrorPage from '@/components/ErrorPage';
+
 import { appFontVariables, appName } from './branding';
-import ErrorPage from './components/ErrorPage';
 import './globals.css';
 
 type GlobalErrorProps = {
@@ -20,7 +21,12 @@ export default function GlobalError({ error, unstable_retry }: GlobalErrorProps)
     <html className={appFontVariables} lang="en">
       <body>
         <title>{`Application error | ${appName}`}</title>
-        <ErrorPage context={{ label: 'Scope', value: 'Application shell' }} error={error} onRetry={unstable_retry} />
+        <ErrorPage
+          context={{ label: 'Scope', value: 'Application shell' }}
+          error={error}
+          eyebrow={appName}
+          onRetry={unstable_retry}
+        />
       </body>
     </html>
   );

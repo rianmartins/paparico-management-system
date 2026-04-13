@@ -1,2 +1,2 @@
-export { default } from './ProdutctsAPI';
-export { ProductsAPI } from './ProdutctsAPI';
+export { default } from './ProductsAPI';
+export { ProductsAPI } from './ProductsAPI';

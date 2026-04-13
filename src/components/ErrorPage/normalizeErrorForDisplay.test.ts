@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { ApiError } from '@/api/errors';
-import { normalizeErrorForDisplay } from '@/app/error-utils';
+
+import { normalizeErrorForDisplay } from './normalizeErrorForDisplay';
 
 describe('normalizeErrorForDisplay', () => {
   it('normalizes ApiError diagnostics into safe display data', () => {

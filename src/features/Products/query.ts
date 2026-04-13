@@ -2,21 +2,22 @@
 
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
-import ProductsService from '@/service/ProductsService';
+import { isUnauthorizedApiError } from '@/api/errors';
+import ProductsService from '@/services/ProductsService';
 import type { ListProductsResponse } from '@/types/Products';
 
 export const productsQueryKey = ['products'] as const;
 
 export const productsQueryOptions = queryOptions({
   queryKey: productsQueryKey,
-  queryFn: async () => ProductsService.listProducts(),
+  queryFn: async () => ProductsService.loadProducts(),
   staleTime: Number.POSITIVE_INFINITY,
   gcTime: Number.POSITIVE_INFINITY,
   refetchOnMount: false,
   refetchOnWindowFocus: false,
   refetchOnReconnect: false,
   retry: false,
-  throwOnError: true
+  throwOnError: (error) => !isUnauthorizedApiError(error)
 });
 
 export type ProductSelector<TData> = (products: ListProductsResponse) => TData;
