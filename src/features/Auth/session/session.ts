@@ -6,6 +6,10 @@ const AUTH_SESSION_CHANGE_EVENT = 'paparico-auth-session-change';
 const APP_ROUTE_PREFIXES = ['/api'];
 const INTERNAL_ORIGIN = 'http://paparico.local';
 
+type StoredAuthSessionPayload = Pick<AuthSession, 'accessToken' | 'refreshToken'> & {
+  requirePasswordUpdate?: unknown;
+};
+
 function getSingleValue(value?: string | string[]) {
   if (Array.isArray(value)) {
     return value[0];
@@ -30,7 +34,7 @@ function emitSessionChange() {
   window.dispatchEvent(new Event(AUTH_SESSION_CHANGE_EVENT));
 }
 
-function isAuthSession(value: unknown): value is AuthSession {
+function isStoredAuthSessionPayload(value: unknown): value is StoredAuthSessionPayload {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -41,6 +45,14 @@ function isAuthSession(value: unknown): value is AuthSession {
     typeof value.refreshToken === 'string' &&
     value.refreshToken.trim().length > 0
   );
+}
+
+function normalizeStoredSession(session: StoredAuthSessionPayload): AuthSession {
+  return {
+    accessToken: session.accessToken.trim(),
+    refreshToken: session.refreshToken.trim(),
+    requirePasswordUpdate: session.requirePasswordUpdate === true
+  };
 }
 
 export function getStoredSession() {
@@ -57,14 +69,11 @@ export function getStoredSession() {
   try {
     const parsedValue = JSON.parse(value);
 
-    if (!isAuthSession(parsedValue)) {
+    if (!isStoredAuthSessionPayload(parsedValue)) {
       return undefined;
     }
 
-    return {
-      accessToken: parsedValue.accessToken.trim(),
-      refreshToken: parsedValue.refreshToken.trim()
-    };
+    return normalizeStoredSession(parsedValue);
   } catch {
     return undefined;
   }
@@ -72,6 +81,10 @@ export function getStoredSession() {
 
 export function hasStoredSession() {
   return getStoredSession() !== undefined;
+}
+
+export function requiresPasswordUpdate() {
+  return getStoredSession()?.requirePasswordUpdate === true;
 }
 
 export function persistSession(session: AuthSession) {
@@ -89,6 +102,27 @@ export function clearStoredSession() {
   }
 
   window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+  emitSessionChange();
+}
+
+export function markPasswordUpdateComplete() {
+  if (!isBrowser()) {
+    return;
+  }
+
+  const session = getStoredSession();
+
+  if (!session) {
+    return;
+  }
+
+  window.localStorage.setItem(
+    AUTH_SESSION_STORAGE_KEY,
+    JSON.stringify({
+      ...session,
+      requirePasswordUpdate: false
+    })
+  );
   emitSessionChange();
 }
 

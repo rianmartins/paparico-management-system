@@ -1,7 +1,7 @@
 import { ServerError } from '@/api/errors';
 import { getAxiosClient } from '@/api/axiosClient';
 import { clearStoredSession, getStoredSession, persistSession } from '@/features/Auth/session';
-import type { AuthSession, LoginCredentials, LoginResponsePayload } from '@/types/Auth';
+import type { AuthSession, LoginCredentials, LoginResponsePayload, UpdatePasswordPayload } from '@/types/Auth';
 
 function extractSession(payload: LoginResponsePayload): AuthSession {
   if (
@@ -14,7 +14,8 @@ function extractSession(payload: LoginResponsePayload): AuthSession {
   ) {
     return {
       accessToken: payload.accessToken.trim(),
-      refreshToken: payload.refreshToken.trim()
+      refreshToken: payload.refreshToken.trim(),
+      requirePasswordUpdate: payload.user?.require_password_update === true
     };
   }
 
@@ -34,6 +35,12 @@ export class AuthAPI {
     persistSession(session);
 
     return session;
+  }
+
+  async updatePassword(payload: UpdatePasswordPayload): Promise<void> {
+    await getAxiosClient().patch('/auth/password', payload, {
+      skipUnauthorizedSessionClear: true
+    });
   }
 
   async logout() {

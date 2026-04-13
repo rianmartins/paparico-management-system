@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import ToastProvider from '@/components/Toast/ToastProvider';
 import { clearStoredSession, persistSession } from './session';
 
 import AuthGuard from './AuthGuard';
@@ -17,18 +18,36 @@ vi.mock('next/navigation', () => ({
 
 function renderGuard() {
   return render(
-    <AuthGuard>
-      <p>Protected content</p>
-    </AuthGuard>
+    <ToastProvider>
+      <AuthGuard>
+        <p>Protected content</p>
+      </AuthGuard>
+    </ToastProvider>
   );
 }
 
 describe('AuthGuard', () => {
+  const originalShowModal = HTMLDialogElement.prototype.showModal;
+  const originalClose = HTMLDialogElement.prototype.close;
+
   beforeEach(() => {
+    HTMLDialogElement.prototype.showModal = vi.fn(function showModal(this: HTMLDialogElement) {
+      this.setAttribute('open', '');
+    });
+
+    HTMLDialogElement.prototype.close = vi.fn(function close(this: HTMLDialogElement) {
+      this.removeAttribute('open');
+    });
+
     clearStoredSession();
     routerReplaceMock.mockReset();
     usePathnameMock.mockReset();
     window.history.replaceState({}, '', '/');
+  });
+
+  afterEach(() => {
+    HTMLDialogElement.prototype.showModal = originalShowModal;
+    HTMLDialogElement.prototype.close = originalClose;
   });
 
   it('redirects unauthenticated protected routes to login with redirects_to', async () => {
@@ -58,7 +77,8 @@ describe('AuthGuard', () => {
   it('redirects authenticated visits from login to the requested page', async () => {
     persistSession({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
     });
     usePathnameMock.mockReturnValue('/');
     window.history.replaceState({}, '', '/?redirects_to=%2Fproducts%3Ftab%3Dactive');
@@ -73,7 +93,8 @@ describe('AuthGuard', () => {
   it('renders protected content while the user is authenticated', () => {
     persistSession({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
     });
     usePathnameMock.mockReturnValue('/products');
     window.history.replaceState({}, '', '/products');
@@ -82,5 +103,21 @@ describe('AuthGuard', () => {
 
     expect(screen.getByText('Protected content')).toBeInTheDocument();
     expect(routerReplaceMock).not.toHaveBeenCalled();
+  });
+
+  it('renders the required password update modal while the authenticated session requires it', async () => {
+    persistSession({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: true
+    });
+    usePathnameMock.mockReturnValue('/products');
+    window.history.replaceState({}, '', '/products');
+
+    renderGuard();
+
+    expect(screen.getByText('Protected content')).toBeInTheDocument();
+    expect(await screen.findByRole('dialog', { name: 'Update your password' })).toHaveAttribute('open');
+    expect(screen.queryByRole('button', { name: 'Close modal' })).not.toBeInTheDocument();
   });
 });

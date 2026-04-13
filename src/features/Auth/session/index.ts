@@ -4,7 +4,9 @@ export {
   getLoginHref,
   getStoredSession,
   hasStoredSession,
+  markPasswordUpdateComplete,
   persistSession,
+  requiresPasswordUpdate,
   sanitizeNextPath,
   subscribeToStoredSession
 } from './session';

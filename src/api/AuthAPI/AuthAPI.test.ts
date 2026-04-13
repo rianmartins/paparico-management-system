@@ -10,25 +10,29 @@ vi.mock('@/api/axiosClient', () => ({
 }));
 
 const postMock = vi.fn();
+const patchMock = vi.fn();
 const mockedGetAxiosClient = vi.mocked(getAxiosClient);
 
 describe('AuthAPI', () => {
   beforeEach(() => {
     postMock.mockReset();
+    patchMock.mockReset();
     mockedGetAxiosClient.mockReset();
     mockedGetAxiosClient.mockReturnValue({
+      patch: patchMock,
       post: postMock
     } as unknown as ReturnType<typeof getAxiosClient>);
     window.localStorage.clear();
   });
 
-  it('stores the access and refresh tokens after login', async () => {
+  it('stores the access, refresh, and required password update state after login', async () => {
     postMock.mockResolvedValue({
       data: {
         user: {
           id: '1',
           email: 'manager@paparico.pt',
-          roles: ['admin']
+          roles: ['admin'],
+          require_password_update: true
         },
         accessToken: 'access-token',
         refreshToken: 'refresh-token'
@@ -42,7 +46,8 @@ describe('AuthAPI', () => {
       })
     ).resolves.toEqual({
       accessToken: 'access-token',
-      refreshToken: 'refresh-token'
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: true
     });
 
     expect(postMock).toHaveBeenCalledWith('/auth/login', {
@@ -52,8 +57,79 @@ describe('AuthAPI', () => {
     expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBe(
       JSON.stringify({
         accessToken: 'access-token',
-        refreshToken: 'refresh-token'
+        refreshToken: 'refresh-token',
+        requirePasswordUpdate: true
       })
+    );
+  });
+
+  it('defaults the required password update state to false when the login flag is missing', async () => {
+    postMock.mockResolvedValue({
+      data: {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token'
+      }
+    });
+
+    await expect(
+      AuthAPI.login({
+        email: 'manager@paparico.pt',
+        password: 'secret'
+      })
+    ).resolves.toEqual({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
+    });
+  });
+
+  it('keeps the required password update state false when the login flag is false', async () => {
+    postMock.mockResolvedValue({
+      data: {
+        user: {
+          id: '1',
+          email: 'manager@paparico.pt',
+          roles: ['admin'],
+          require_password_update: false
+        },
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token'
+      }
+    });
+
+    await expect(
+      AuthAPI.login({
+        email: 'manager@paparico.pt',
+        password: 'secret'
+      })
+    ).resolves.toEqual({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
+    });
+  });
+
+  it('updates the authenticated user password', async () => {
+    patchMock.mockResolvedValue({
+      data: null
+    });
+
+    await expect(
+      AuthAPI.updatePassword({
+        currentPassword: 'current-secret',
+        newPassword: 'new-secret'
+      })
+    ).resolves.toBeUndefined();
+
+    expect(patchMock).toHaveBeenCalledWith(
+      '/auth/password',
+      {
+        currentPassword: 'current-secret',
+        newPassword: 'new-secret'
+      },
+      {
+        skipUnauthorizedSessionClear: true
+      }
     );
   });
 
