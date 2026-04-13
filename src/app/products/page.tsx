@@ -1,9 +1,24 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 import LogoutButton from '@/features/Auth/LogoutButton';
 import ProductList from '@/features/Products/ProductList';
+import Sidebar from '@/components/Sidebar';
 
 import styles from './page.module.css';
+import tabs from '../tabs';
 
 export default function ProductsPage() {
+  const [selectedTabId, setSelectedTabId] = useState('products');
+  const router = useRouter();
+
+  const handleTabSelect = (tabId: string) => {
+    setSelectedTabId(tabId);
+    router.push(`/${tabId}`);
+  };
+
   return (
     <div className={styles.page}>
       <header className={styles.productsHeader}>
@@ -14,22 +29,19 @@ export default function ProductsPage() {
       </header>
 
       <main className={styles.main}>
-        <section className={styles.hero}>
-          <p className={styles.eyebrow}>Catalog workspace</p>
-          <h1>Catalog overview</h1>
-          <p className={styles.heroText}>This page fetches the product catalog directly from the backend API.</p>
-        </section>
-
-        <section className={styles.content}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2>Catalog overview</h2>
-              <p>Live product data from the `/products` endpoint.</p>
-            </div>
-          </div>
-
-          <ProductList />
-        </section>
+        <Sidebar
+          ariaLabel="Management navigation"
+          data-testid="sidebar"
+          onTabSelect={handleTabSelect}
+          selectedTabId={selectedTabId}
+          tabs={tabs}
+        />
+        <div>
+          <h1>Products</h1>
+          <section className={styles.content}>
+            <ProductList />
+          </section>
+        </div>
       </main>
     </div>
   );

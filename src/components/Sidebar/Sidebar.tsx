@@ -120,7 +120,8 @@ export default function Sidebar({
 
   function handleTabClick(tab: SidebarTabItem) {
     if (tab.id === selectedTabId) {
-      handleCollapsedChange();
+      // TODO: define how collapsed state should be handled
+      // handleCollapsedChange();
       return;
     }
 
