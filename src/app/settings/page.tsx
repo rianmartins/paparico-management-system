@@ -1,5 +1,4 @@
 import AppSidebar from '@/features/AppSidebar';
-import LogoutButton from '@/features/Auth/LogoutButton';
 import { CurrentUserInformation, UpdatePasswordSection } from '@/features/Settings';
 
 import styles from './page.module.css';
@@ -10,13 +9,6 @@ export default function SettingsPage() {
       <AppSidebar />
 
       <div className={styles.contentShell}>
-        <header className={styles.settingsHeader}>
-          <div className={styles.settingsHeaderInner}>
-            <h3 className={styles.settingsHeaderBrand}>Paparico Management</h3>
-            <LogoutButton />
-          </div>
-        </header>
-
         <main className={styles.main}>
           <section className={styles.userSection}>
             <h1 className={styles.title}>Settings</h1>
