@@ -6,7 +6,11 @@ import { useRouter } from 'next/navigation';
 import AuthAPI from '@/api/AuthAPI';
 import Button from '@/components/Button';
 
-export default function LogoutButton() {
+type LogoutButtonProps = {
+  className?: string;
+};
+
+export default function LogoutButton({ className }: LogoutButtonProps = {}) {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
@@ -22,7 +26,7 @@ export default function LogoutButton() {
   };
 
   return (
-    <Button disabled={isPending} onClick={handleLogout} type="button" variant="secondary">
+    <Button className={className} disabled={isPending} onClick={handleLogout} type="button" variant="secondary">
       {isPending ? 'Signing out...' : 'Sign out'}
     </Button>
   );

@@ -11,14 +11,17 @@ vi.mock('@/api/axiosClient', () => ({
 
 const postMock = vi.fn();
 const patchMock = vi.fn();
+const getMock = vi.fn();
 const mockedGetAxiosClient = vi.mocked(getAxiosClient);
 
 describe('AuthAPI', () => {
   beforeEach(() => {
     postMock.mockReset();
     patchMock.mockReset();
+    getMock.mockReset();
     mockedGetAxiosClient.mockReset();
     mockedGetAxiosClient.mockReturnValue({
+      get: getMock,
       patch: patchMock,
       post: postMock
     } as unknown as ReturnType<typeof getAxiosClient>);
@@ -32,6 +35,7 @@ describe('AuthAPI', () => {
           id: '1',
           email: 'manager@paparico.pt',
           roles: ['admin'],
+          name: 'Paparico Manager',
           require_password_update: true
         },
         accessToken: 'access-token',
@@ -90,6 +94,7 @@ describe('AuthAPI', () => {
           id: '1',
           email: 'manager@paparico.pt',
           roles: ['admin'],
+          name: 'Paparico Manager',
           require_password_update: false
         },
         accessToken: 'access-token',
@@ -107,6 +112,28 @@ describe('AuthAPI', () => {
       refreshToken: 'refresh-token',
       requirePasswordUpdate: false
     });
+  });
+
+  it('loads the authenticated user', async () => {
+    getMock.mockResolvedValue({
+      data: {
+        id: '1',
+        email: 'manager@paparico.pt',
+        roles: ['admin'],
+        name: 'Paparico Manager',
+        require_password_update: false
+      }
+    });
+
+    await expect(AuthAPI.me()).resolves.toEqual({
+      id: '1',
+      email: 'manager@paparico.pt',
+      roles: ['admin'],
+      name: 'Paparico Manager',
+      require_password_update: false
+    });
+
+    expect(getMock).toHaveBeenCalledWith('/auth/me');
   });
 
   it('updates the authenticated user password', async () => {

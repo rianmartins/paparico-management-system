@@ -1,7 +1,13 @@
 import { ServerError } from '@/api/errors';
 import { getAxiosClient } from '@/api/axiosClient';
 import { clearStoredSession, getStoredSession, persistSession } from '@/features/Auth/session';
-import type { AuthSession, LoginCredentials, LoginResponsePayload, UpdatePasswordPayload } from '@/types/Auth';
+import type {
+  AuthSession,
+  AuthUser,
+  LoginCredentials,
+  LoginResponsePayload,
+  UpdatePasswordPayload
+} from '@/types/Auth';
 
 function extractSession(payload: LoginResponsePayload): AuthSession {
   if (
@@ -35,6 +41,12 @@ export class AuthAPI {
     persistSession(session);
 
     return session;
+  }
+
+  async me(): Promise<AuthUser> {
+    const response = await getAxiosClient().get<AuthUser>('/auth/me');
+
+    return response.data;
   }
 
   async updatePassword(payload: UpdatePasswordPayload): Promise<void> {

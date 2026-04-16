@@ -5,13 +5,8 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import RequiredPasswordUpdateModal from './RequiredPasswordUpdateModal';
-import {
-  getLoginHref,
-  hasStoredSession,
-  requiresPasswordUpdate,
-  sanitizeNextPath,
-  subscribeToStoredSession
-} from './session';
+import { getLoginHref, sanitizeNextPath } from './redirects';
+import { hasStoredSession, requiresPasswordUpdate, subscribeToStoredSession } from './session';
 
 export type AuthGuardProps = {
   children: ReactNode;

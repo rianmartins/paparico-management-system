@@ -3,6 +3,7 @@ export type AuthUser = {
   email: string;
   roles: string[];
   require_password_update?: boolean;
+  name: string | null;
 };
 
 export type LoginCredentials = {

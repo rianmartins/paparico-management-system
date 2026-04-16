@@ -74,6 +74,19 @@ describe('AuthGuard', () => {
     });
   });
 
+  it('protects the settings route for unauthenticated visits', async () => {
+    usePathnameMock.mockReturnValue('/settings');
+    window.history.replaceState({}, '', '/settings');
+
+    renderGuard();
+
+    await waitFor(() => {
+      expect(routerReplaceMock).toHaveBeenCalledWith('/?redirects_to=%2Fsettings');
+    });
+
+    expect(screen.queryByText('Protected content')).not.toBeInTheDocument();
+  });
+
   it('redirects authenticated visits from login to the requested page', async () => {
     persistSession({
       accessToken: 'access-token',
