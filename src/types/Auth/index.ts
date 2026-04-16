@@ -15,7 +15,6 @@ export type AuthSession = {
   accessToken: string;
   refreshToken: string;
   requirePasswordUpdate: boolean;
-  user?: AuthUser;
 };
 
 export type LoginResponsePayload = {

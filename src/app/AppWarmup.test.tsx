@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AuthAPI from '@/api/AuthAPI';
 import ProductsAPI from '@/api/ProductsAPI';
 import AppProviders from '@/app/providers';
-import { clearStoredSession, getStoredUser, persistSession } from '@/features/Auth/session';
+import { clearStoredSession, persistSession } from '@/features/Auth/session';
 import { useProductsValue } from '@/features/Products';
 import type { AuthUser } from '@/types/Auth';
 import type { Product } from '@/types/Products';
@@ -127,12 +127,6 @@ describe('AppWarmup', () => {
     await waitFor(() => {
       expect(mockedListProducts).toHaveBeenCalledTimes(1);
       expect(mockedMe).toHaveBeenCalledTimes(1);
-    });
-    expect(getStoredUser()).toEqual({
-      id: '1',
-      email: 'manager@paparico.pt',
-      roles: ['admin'],
-      name: 'Paparico Manager'
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Show products' }));

@@ -72,13 +72,7 @@ describe('UpdatePasswordSection', () => {
     persistSession({
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
-      requirePasswordUpdate: true,
-      user: {
-        id: '1',
-        email: 'manager@paparico.pt',
-        roles: ['admin'],
-        name: 'Paparico Manager'
-      }
+      requirePasswordUpdate: true
     });
     renderUpdatePasswordSection();
 
@@ -93,12 +87,10 @@ describe('UpdatePasswordSection', () => {
     });
 
     expect(await screen.findByText('Your password has been updated.')).toBeInTheDocument();
-    expect(getStoredSession()?.requirePasswordUpdate).toBe(false);
-    expect(getStoredSession()?.user).toEqual({
-      id: '1',
-      email: 'manager@paparico.pt',
-      roles: ['admin'],
-      name: 'Paparico Manager'
+    expect(getStoredSession()).toEqual({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
     });
   });
 

@@ -3,24 +3,9 @@ import type { AuthSession } from '@/types/Auth';
 export const AUTH_SESSION_STORAGE_KEY = 'paparico_auth_session';
 const AUTH_SESSION_CHANGE_EVENT = 'paparico-auth-session-change';
 
-const APP_ROUTE_PREFIXES = ['/api'];
-const INTERNAL_ORIGIN = 'http://paparico.local';
-
 type StoredAuthSessionPayload = Pick<AuthSession, 'accessToken' | 'refreshToken'> & {
   requirePasswordUpdate?: unknown;
 };
-
-function getSingleValue(value?: string | string[]) {
-  if (Array.isArray(value)) {
-    return value[0];
-  }
-
-  return value;
-}
-
-function isAppRoute(pathname: string) {
-  return APP_ROUTE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
-}
 
 function isBrowser() {
   return typeof window !== 'undefined';
@@ -92,7 +77,7 @@ export function persistSession(session: AuthSession) {
     return;
   }
 
-  window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
+  window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(normalizeStoredSession(session)));
   emitSessionChange();
 }
 
@@ -142,34 +127,4 @@ export function subscribeToStoredSession(onChange: () => void) {
     window.removeEventListener('storage', handleChange);
     window.removeEventListener(AUTH_SESSION_CHANGE_EVENT, handleChange);
   };
-}
-
-export function sanitizeNextPath(value?: string | string[]) {
-  const candidate = getSingleValue(value);
-
-  if (!candidate || !candidate.startsWith('/') || candidate.startsWith('//')) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(candidate, INTERNAL_ORIGIN);
-
-    if (url.origin !== INTERNAL_ORIGIN || isAppRoute(url.pathname)) {
-      return undefined;
-    }
-
-    return `${url.pathname}${url.search}${url.hash}`;
-  } catch {
-    return undefined;
-  }
-}
-
-export function getLoginHref(nextPath?: string | string[]) {
-  const sanitizedNextPath = sanitizeNextPath(nextPath);
-
-  if (!sanitizedNextPath || sanitizedNextPath === '/') {
-    return '/';
-  }
-
-  return `/?redirects_to=${encodeURIComponent(sanitizedNextPath)}`;
 }

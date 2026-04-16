@@ -1,15 +1,14 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   AUTH_SESSION_STORAGE_KEY,
   clearStoredSession,
-  getLoginHref,
   getStoredSession,
   hasStoredSession,
   markPasswordUpdateComplete,
   persistSession,
   requiresPasswordUpdate,
-  sanitizeNextPath
+  subscribeToStoredSession
 } from './session';
 
 describe('features/Auth/session', () => {
@@ -57,6 +56,23 @@ describe('features/Auth/session', () => {
     expect(requiresPasswordUpdate()).toBe(false);
   });
 
+  it('returns undefined for malformed stored sessions', () => {
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: '',
+        refreshToken: 'refresh-token',
+        requirePasswordUpdate: false
+      })
+    );
+
+    expect(getStoredSession()).toBeUndefined();
+
+    window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, '{');
+
+    expect(getStoredSession()).toBeUndefined();
+  });
+
   it('marks the required password update as complete', () => {
     persistSession({
       accessToken: 'access-token',
@@ -74,6 +90,27 @@ describe('features/Auth/session', () => {
     expect(requiresPasswordUpdate()).toBe(false);
   });
 
+  it('notifies subscribers when the session changes', () => {
+    const onChange = vi.fn();
+    const unsubscribe = subscribeToStoredSession(onChange);
+
+    persistSession({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: true
+    });
+    markPasswordUpdateComplete();
+    clearStoredSession();
+    unsubscribe();
+    persistSession({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      requirePasswordUpdate: false
+    });
+
+    expect(onChange).toHaveBeenCalledTimes(3);
+  });
+
   it('clears the stored session', () => {
     persistSession({
       accessToken: 'access-token',
@@ -85,20 +122,5 @@ describe('features/Auth/session', () => {
 
     expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeNull();
     expect(getStoredSession()).toBeUndefined();
-  });
-
-  it('accepts internal page paths and preserves their query string', () => {
-    expect(sanitizeNextPath('/products?tab=active')).toBe('/products?tab=active');
-  });
-
-  it('rejects malformed, external, and app-route redirect targets', () => {
-    expect(sanitizeNextPath('https://example.com')).toBeUndefined();
-    expect(sanitizeNextPath('//example.com')).toBeUndefined();
-    expect(sanitizeNextPath('/api/products')).toBeUndefined();
-  });
-
-  it('builds a safe login href with the redirects_to parameter only for allowed paths', () => {
-    expect(getLoginHref('/products?tab=active')).toBe('/?redirects_to=%2Fproducts%3Ftab%3Dactive');
-    expect(getLoginHref('/api/products')).toBe('/');
   });
 });

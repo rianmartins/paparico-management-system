@@ -1,5 +1,5 @@
 import LoginForm from '@/features/Auth/LoginForm';
-import { sanitizeNextPath } from '@/features/Auth/session';
+import { sanitizeNextPath } from '@/features/Auth/redirects';
 import styles from './page.module.css';
 
 type HomePageProps = {
