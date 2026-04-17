@@ -1,4 +1,5 @@
 import AppSidebar from '@/features/AppSidebar';
+import ProductCreateAction from '@/features/Products/ProductCreateAction';
 import ProductList from '@/features/Products/ProductList';
 
 import styles from './page.module.css';
@@ -10,7 +11,10 @@ export default function ProductsPage() {
 
       <div className={styles.contentShell}>
         <main className={styles.main}>
-          <h1>Products</h1>
+          <div className={styles.pageHeader}>
+            <h1 className={styles.title}>Products</h1>
+            <ProductCreateAction />
+          </div>
           <section className={styles.content}>
             <ProductList />
           </section>
