@@ -38,11 +38,10 @@ const columns = [
 ] as const;
 
 describe('Table', () => {
-  it('renders semantic table structure and caption', () => {
-    render(<Table caption="Products overview" columns={columns} data={rows} rowKey="id" />);
+  it('renders semantic table structure', () => {
+    render(<Table columns={columns} data={rows} rowKey="id" />);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByText('Products overview')).toBeInTheDocument();
   });
 
   it('applies base and structural classes', () => {

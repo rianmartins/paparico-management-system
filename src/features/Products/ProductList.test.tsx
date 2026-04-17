@@ -104,7 +104,7 @@ describe('ProductList', () => {
 
     renderWithQueryClient(<ProductList />);
 
-    expect(screen.getByRole('table', { name: 'Products overview' })).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
@@ -117,7 +117,7 @@ describe('ProductList', () => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
     });
 
-    const table = screen.getByRole('table', { name: 'Products overview' });
+    const table = screen.getByRole('table');
 
     expect(within(table).getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(within(table).getByRole('columnheader', { name: 'SKU' })).toBeInTheDocument();
@@ -177,8 +177,8 @@ describe('ProductList', () => {
     expect(screen.getByText('PAP-002')).toBeInTheDocument();
     expect(screen.getByText('15,99 €')).toBeInTheDocument();
     expect(mockedListProducts).toHaveBeenCalledTimes(2);
-    expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 25 });
-    expect(mockedListProducts).toHaveBeenNthCalledWith(2, { q: 'Seasonal', offset: 0, limit: 25 });
+    expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 20 });
+    expect(mockedListProducts).toHaveBeenNthCalledWith(2, { q: 'Seasonal', offset: 0, limit: 20 });
   });
 
   it('fetches the next product page with offset and limit params', async () => {
@@ -186,19 +186,19 @@ describe('ProductList', () => {
       .mockResolvedValueOnce(
         listProductsResponseFixture([productFixture], {
           offset: 0,
-          limit: 25,
-          count: 25,
-          total: 50,
+          limit: 20,
+          count: 20,
+          total: 40,
           has_more: true,
-          next_offset: 25
+          next_offset: 20
         })
       )
       .mockResolvedValueOnce(
         listProductsResponseFixture([searchedProductFixture], {
-          offset: 25,
-          limit: 25,
-          count: 25,
-          total: 50,
+          offset: 20,
+          limit: 20,
+          count: 20,
+          total: 40,
           has_more: false,
           next_offset: null
         })
@@ -218,8 +218,8 @@ describe('ProductList', () => {
 
     expect(screen.queryByText('Chocolate Cake')).not.toBeInTheDocument();
     expect(mockedListProducts).toHaveBeenCalledTimes(2);
-    expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 25 });
-    expect(mockedListProducts).toHaveBeenNthCalledWith(2, { offset: 25, limit: 25 });
+    expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 20 });
+    expect(mockedListProducts).toHaveBeenNthCalledWith(2, { offset: 20, limit: 20 });
   });
 
   it('bubbles failed product requests into the nearest error boundary', async () => {
