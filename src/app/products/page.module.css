@@ -39,12 +39,19 @@
   color: var(--color-text-accent);
 }
 
-.main h1 {
-  margin-inline: 0;
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
+}
+
+.title {
+  margin: 0;
   font-size: var(--font-size-h1);
   line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-display);
+  letter-spacing: 0;
 }
 
 .heroText {
@@ -95,6 +102,13 @@
   .hero,
   .content {
     padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pageHeader {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 

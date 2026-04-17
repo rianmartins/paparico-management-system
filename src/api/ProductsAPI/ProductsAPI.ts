@@ -1,5 +1,5 @@
 import { getAxiosClient } from '@/api/axiosClient';
-import type { ListProductsParams, ListProductsResponse } from '@/types/Products';
+import type { CreateProductPayload, ListProductsParams, ListProductsResponse, Product } from '@/types/Products';
 
 export class ProductsAPI {
   async listProducts(params: ListProductsParams = {}): Promise<ListProductsResponse> {
@@ -7,6 +7,12 @@ export class ProductsAPI {
     const response = hasParams
       ? await getAxiosClient().get<ListProductsResponse>('/products', { params })
       : await getAxiosClient().get<ListProductsResponse>('/products');
+
+    return response.data;
+  }
+
+  async createProduct(payload: CreateProductPayload): Promise<Product> {
+    const response = await getAxiosClient().post<Product>('/products', payload);
 
     return response.data;
   }

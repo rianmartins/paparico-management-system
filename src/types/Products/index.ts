@@ -4,6 +4,23 @@ export type ProductDecimal = number | string;
 
 export type ProductDateTime = Date | string;
 
+export type ProductTaxCode = 'NOR' | 'INT' | 'RED' | 'ISE';
+
+export type CreateVariantPayload = {
+  flavor: string;
+};
+
+export type CreateProductPayload = {
+  sku: string;
+  name: string;
+  base_price_cents: number;
+  tax_code: ProductTaxCode;
+  allow_pickup: boolean;
+  allow_inhouse: boolean;
+  allow_eurosender: boolean;
+  product_variants?: CreateVariantPayload[];
+};
+
 export type ProductVariant = {
   id: ProductBigInt;
   product_id: ProductBigInt;
