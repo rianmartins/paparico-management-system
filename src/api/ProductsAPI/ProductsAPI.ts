@@ -1,9 +1,12 @@
 import { getAxiosClient } from '@/api/axiosClient';
-import type { ListProductsResponse } from '@/types/Products';
+import type { ListProductsParams, ListProductsResponse } from '@/types/Products';
 
 export class ProductsAPI {
-  async listProducts(): Promise<ListProductsResponse> {
-    const response = await getAxiosClient().get<ListProductsResponse>('/products');
+  async listProducts(params: ListProductsParams = {}): Promise<ListProductsResponse> {
+    const hasParams = Object.keys(params).length > 0;
+    const response = hasParams
+      ? await getAxiosClient().get<ListProductsResponse>('/products', { params })
+      : await getAxiosClient().get<ListProductsResponse>('/products');
 
     return response.data;
   }

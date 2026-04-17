@@ -8,7 +8,7 @@ import AppProviders from '@/app/providers';
 import { clearStoredSession, persistSession } from '@/features/Auth/session';
 import { useProductsValue } from '@/features/Products';
 import type { AuthUser } from '@/types/Auth';
-import type { Product } from '@/types/Products';
+import type { ListProductsResponse, Product } from '@/types/Products';
 
 import AppWarmup from './AppWarmup';
 
@@ -59,8 +59,24 @@ const productFixture: Product = {
   product_variants: []
 };
 
+function listProductsResponseFixture(products: Product[]): ListProductsResponse {
+  return {
+    data: products,
+    meta: {
+      offset: 0,
+      limit: products.length,
+      count: products.length,
+      total: products.length,
+      has_more: false,
+      next_offset: null
+    }
+  };
+}
+
 function ProductNameConsumer() {
-  const { data } = useProductsValue((products) => products.map((product) => product.name).join(', '));
+  const { data } = useProductsValue((productsResponse) =>
+    productsResponse.data.map((product) => product.name).join(', ')
+  );
 
   return <p>{data ?? 'Loading products...'}</p>;
 }
@@ -86,7 +102,7 @@ describe('AppWarmup', () => {
   });
 
   it('does not prefetch protected product data before a consumer asks for it', async () => {
-    mockedListProducts.mockResolvedValue([productFixture]);
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
 
     render(
       <AppProviders>
@@ -109,7 +125,7 @@ describe('AppWarmup', () => {
   });
 
   it('warms the products and current user queries once after an authenticated session is available', async () => {
-    mockedListProducts.mockResolvedValue([productFixture]);
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
     mockedMe.mockResolvedValue(authUserFixture);
     persistSession({
       accessToken: 'access-token',

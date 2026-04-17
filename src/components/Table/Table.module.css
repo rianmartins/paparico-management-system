@@ -100,6 +100,87 @@
   gap: 0.5rem;
 }
 
+.TableFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.paginationSummary {
+  margin: 0;
+  color: var(--color-text-secondary-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 0.375rem;
+}
+
+.paginationButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: 0.5rem;
+  background: var(--color-surface-default);
+  color: var(--color-text-strong);
+  font: inherit;
+  font-size: var(--font-size-body-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-border-brand);
+    background: var(--color-surface-brand-muted);
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem var(--color-shadow-primary-ring-xs);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}
+
+.activePaginationButton {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  opacity: 1;
+
+  &:disabled {
+    opacity: 1;
+  }
+}
+
+.paginationEllipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2.25rem;
+  color: var(--color-text-secondary-muted);
+  font-size: var(--font-size-body-sm);
+  font-weight: 700;
+}
+
 .left {
   text-align: left;
 }
@@ -148,5 +229,14 @@
   .actions {
     flex-direction: column;
     width: 100%;
+  }
+
+  .TableFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .paginationControls {
+    justify-content: start;
   }
 }

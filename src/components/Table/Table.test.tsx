@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import Table from '@/components/Table';
 
@@ -88,5 +88,84 @@ describe('Table', () => {
     expect(screen.getByRole('button', { name: /status/i })).toBeInTheDocument();
     expect(screen.getByText('Actions')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2);
+  });
+
+  it('renders compact pagination and emits offset changes', () => {
+    const handlePageChange = vi.fn();
+
+    render(
+      <Table
+        columns={columns}
+        data={rows}
+        pagination={{
+          offset: 0,
+          limit: 25,
+          total: 125,
+          onPageChange: handlePageChange
+        }}
+        rowKey="id"
+      />
+    );
+
+    const pagination = screen.getByRole('navigation', { name: 'Table pagination' });
+
+    expect(screen.getByText('Showing 1-25 of 125')).toBeInTheDocument();
+    expect(within(pagination).getByRole('button', { name: 'Previous page' })).toBeDisabled();
+    expect(within(pagination).getByRole('button', { name: 'Page 1, current page' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(within(pagination).getByText('...')).toBeInTheDocument();
+    expect(within(pagination).getByRole('button', { name: 'Page 5' })).toBeInTheDocument();
+
+    fireEvent.click(within(pagination).getByRole('button', { name: 'Next page' }));
+
+    expect(handlePageChange).toHaveBeenCalledWith({
+      page: 2,
+      offset: 25,
+      limit: 25
+    });
+  });
+
+  it('calculates the current pagination page from the offset', () => {
+    render(
+      <Table
+        columns={columns}
+        data={rows}
+        pagination={{
+          offset: 75,
+          limit: 25,
+          total: 250,
+          onPageChange: () => undefined
+        }}
+        rowKey="id"
+      />
+    );
+
+    const pagination = screen.getByRole('navigation', { name: 'Table pagination' });
+
+    expect(screen.getByText('Showing 76-100 of 250')).toBeInTheDocument();
+    expect(within(pagination).getByRole('button', { name: 'Page 4, current page' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+  });
+
+  it('hides pagination when the result set fits on one page', () => {
+    render(
+      <Table
+        columns={columns}
+        data={rows}
+        pagination={{
+          offset: 0,
+          limit: 25,
+          total: rows.length,
+          onPageChange: () => undefined
+        }}
+        rowKey="id"
+      />
+    );
+
+    expect(screen.queryByRole('navigation', { name: 'Table pagination' })).not.toBeInTheDocument();
   });
 });

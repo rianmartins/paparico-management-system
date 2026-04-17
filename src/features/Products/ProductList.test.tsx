@@ -1,11 +1,11 @@
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ProductsAPI from '@/api/ProductsAPI';
 import { ApiError } from '@/api/errors';
 import { renderWithQueryClient } from '@/test/renderWithQueryClient';
 import TestErrorBoundary from '@/test/TestErrorBoundary';
-import type { Product } from '@/types/Products';
+import type { ListProductsMeta, ListProductsResponse, Product } from '@/types/Products';
 
 import ProductList from './ProductList';
 
@@ -41,6 +41,54 @@ const productFixture: Product = {
   product_variants: []
 };
 
+const searchedProductFixture: Product = {
+  ...productFixture,
+  id: '2',
+  sku: 'PAP-002',
+  name: 'Seasonal Tart',
+  base_price_cents: 1599,
+  is_active: false,
+  allow_pickup: false,
+  allow_inhouse: false,
+  product_variants: [
+    {
+      id: '10',
+      product_id: '2',
+      variant_code: 'MINI',
+      flavor: 'Mini',
+      price_override_cents: null,
+      is_active: true,
+      allow_pickup: null,
+      allow_inhouse: null,
+      allow_eurosender: null,
+      external_toconline_product_id: null,
+      external_toconline_item_code: null
+    }
+  ]
+};
+
+function listProductsResponseFixture(
+  products: Product[],
+  metaOverrides: Partial<ListProductsMeta> = {}
+): ListProductsResponse {
+  const offset = metaOverrides.offset ?? 0;
+  const limit = metaOverrides.limit ?? products.length;
+  const count = metaOverrides.count ?? products.length;
+  const total = metaOverrides.total ?? products.length;
+
+  return {
+    data: products,
+    meta: {
+      offset,
+      limit,
+      count,
+      total,
+      has_more: metaOverrides.has_more ?? offset + count < total,
+      next_offset: metaOverrides.next_offset ?? (offset + limit < total ? offset + limit : null)
+    }
+  };
+}
+
 describe('ProductList', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
@@ -56,11 +104,12 @@ describe('ProductList', () => {
 
     renderWithQueryClient(<ProductList />);
 
-    expect(screen.getByText('Loading products...')).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Products overview' })).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('renders products returned by the service', async () => {
-    mockedListProducts.mockResolvedValue([productFixture]);
+  it('renders products returned by the service in the table', async () => {
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
 
     renderWithQueryClient(<ProductList />);
 
@@ -68,18 +117,109 @@ describe('ProductList', () => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('PAP-001')).toBeInTheDocument();
-    expect(screen.getByText('12,99 €')).toBeInTheDocument();
+    const table = screen.getByRole('table', { name: 'Products overview' });
+
+    expect(within(table).getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'SKU' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Price' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Status' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Variants' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Pickup' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'In-house' })).toBeInTheDocument();
+
+    const productRow = screen.getByText('Chocolate Cake').closest('tr');
+
+    if (!productRow) {
+      throw new Error('Expected product table row to render.');
+    }
+
+    expect(within(productRow).getByText('PAP-001')).toBeInTheDocument();
+    expect(within(productRow).getByText('12,99 €')).toBeInTheDocument();
+    expect(within(productRow).getByText('Active')).toBeInTheDocument();
+    expect(within(productRow).getByText('0')).toBeInTheDocument();
+    expect(within(productRow).getAllByText('Yes')).toHaveLength(2);
+    expect(within(table).queryAllByRole('button')).toHaveLength(0);
   });
 
   it('renders the empty state when no products are returned', async () => {
-    mockedListProducts.mockResolvedValue([]);
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([]));
 
     renderWithQueryClient(<ProductList />);
 
     await waitFor(() => {
       expect(screen.getByText('No products available yet.')).toBeInTheDocument();
     });
+  });
+
+  it('fetches searched products when the search form is submitted', async () => {
+    mockedListProducts
+      .mockResolvedValueOnce(listProductsResponseFixture([productFixture]))
+      .mockResolvedValueOnce(listProductsResponseFixture([searchedProductFixture]));
+
+    renderWithQueryClient(<ProductList />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Search products' }), {
+      target: {
+        value: ' Seasonal '
+      }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Seasonal Tart')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Chocolate Cake')).not.toBeInTheDocument();
+    expect(screen.getByText('PAP-002')).toBeInTheDocument();
+    expect(screen.getByText('15,99 €')).toBeInTheDocument();
+    expect(mockedListProducts).toHaveBeenCalledTimes(2);
+    expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 25 });
+    expect(mockedListProducts).toHaveBeenNthCalledWith(2, { q: 'Seasonal', offset: 0, limit: 25 });
+  });
+
+  it('fetches the next product page with offset and limit params', async () => {
+    mockedListProducts
+      .mockResolvedValueOnce(
+        listProductsResponseFixture([productFixture], {
+          offset: 0,
+          limit: 25,
+          count: 25,
+          total: 50,
+          has_more: true,
+          next_offset: 25
+        })
+      )
+      .mockResolvedValueOnce(
+        listProductsResponseFixture([searchedProductFixture], {
+          offset: 25,
+          limit: 25,
+          count: 25,
+          total: 50,
+          has_more: false,
+          next_offset: null
+        })
+      );
+
+    renderWithQueryClient(<ProductList />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Seasonal Tart')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Chocolate Cake')).not.toBeInTheDocument();
+    expect(mockedListProducts).toHaveBeenCalledTimes(2);
+    expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 25 });
+    expect(mockedListProducts).toHaveBeenNthCalledWith(2, { offset: 25, limit: 25 });
   });
 
   it('bubbles failed product requests into the nearest error boundary', async () => {

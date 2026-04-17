@@ -1,106 +1,31 @@
-.stateMessage {
-  margin: 0;
-  padding: 20px 0;
-  font-size: var(--font-size-body);
-  color: var(--color-text-subtle);
-}
-
-.productsList {
+.productList {
   display: grid;
-  gap: 16px;
+  gap: 1rem;
 }
 
-.productCard {
-  padding: 24px;
-  border-radius: 22px;
-  border: 1px solid var(--color-border-contrast);
-  background: linear-gradient(180deg, var(--color-surface-default) 0%, var(--color-surface-warm) 100%);
-}
-
-.productHeader {
+.searchForm {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: end;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-.productHeader h2 {
-  margin: 4px 0 0;
-  font-size: var(--font-size-h3);
-  letter-spacing: var(--letter-spacing-heading-tight);
+.searchInput {
+  flex: 1 1 20rem;
 }
 
-.productSku {
-  margin: 0;
-  font-size: var(--font-size-label);
-  font-weight: 700;
-  letter-spacing: var(--letter-spacing-caption);
-  text-transform: uppercase;
-  color: var(--color-text-accent-soft);
+.searchButton {
+  flex: 0 0 auto;
 }
 
-.productPrice {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: var(--color-text-base);
-  color: var(--color-text-inverse);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.productDescription {
-  margin: 16px 0 0;
-  color: var(--color-text-body-soft);
-  line-height: var(--line-height-paragraph);
-}
-
-.productMeta {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 20px 0 0;
-}
-
-.productMeta div {
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: var(--color-surface-warm-muted);
-}
-
-.productMeta dt {
-  margin: 0;
-  font-size: var(--font-size-label-sm);
-  font-weight: 700;
-  letter-spacing: var(--letter-spacing-caption);
-  text-transform: uppercase;
-  color: var(--color-text-label);
-}
-
-.productMeta dd {
-  margin: 8px 0 0;
-  font-size: var(--font-size-body-emphasis);
-  font-weight: 600;
-}
-
-@media (max-width: 768px) {
-  .productCard {
-    padding: 20px;
-  }
-
-  .productHeader {
+@media (max-width: 640px) {
+  .searchForm {
+    align-items: stretch;
     flex-direction: column;
   }
 
-  .productMeta {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 520px) {
-  .productMeta {
-    grid-template-columns: 1fr;
+  .searchInput,
+  .searchButton {
+    width: 100%;
   }
 }

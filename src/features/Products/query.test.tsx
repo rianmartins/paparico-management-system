@@ -9,7 +9,7 @@ import { selectActiveProducts, selectProductOptions, selectProductsTableRows } f
 import { createTestQueryClient } from '@/test/createTestQueryClient';
 import { renderWithQueryClient } from '@/test/renderWithQueryClient';
 import TestErrorBoundary from '@/test/TestErrorBoundary';
-import type { Product } from '@/types/Products';
+import type { ListProductsResponse, Product } from '@/types/Products';
 
 import { productsQueryKey, useProductsValue } from './query';
 
@@ -56,6 +56,20 @@ const inactiveProductFixture: Product = {
   allow_inhouse: false
 };
 
+function listProductsResponseFixture(products: Product[]): ListProductsResponse {
+  return {
+    data: products,
+    meta: {
+      offset: 0,
+      limit: products.length,
+      count: products.length,
+      total: products.length,
+      has_more: false,
+      next_offset: null
+    }
+  };
+}
+
 function ActiveProductsConsumer() {
   const { data } = useProductsValue(selectActiveProducts);
 
@@ -79,9 +93,17 @@ function ProductTableRowsConsumer() {
   return <p>{data?.map((row) => `${row.name}:${row.price}`).join(', ') ?? 'Loading rows...'}</p>;
 }
 
+function PaginatedProductTableRowsConsumer() {
+  const { data } = useProductsValue(selectProductsTableRows, { offset: 25, limit: 25 });
+
+  return <p>{data?.map((row) => `${row.name}:${row.price}`).join(', ') ?? 'Loading rows...'}</p>;
+}
+
 function ProductsInvalidationConsumer() {
   const queryClient = useQueryClient();
-  const { data } = useProductsValue((products) => products.map((product) => product.name).join(', '));
+  const { data } = useProductsValue((productsResponse) =>
+    productsResponse.data.map((product) => product.name).join(', ')
+  );
 
   return (
     <>
@@ -104,7 +126,7 @@ describe('products query', () => {
   });
 
   it('shares one cached fetch across consumers with different selectors', async () => {
-    mockedListProducts.mockResolvedValue([activeProductFixture, inactiveProductFixture]);
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([activeProductFixture, inactiveProductFixture]));
 
     renderWithQueryClient(
       <>
@@ -124,7 +146,7 @@ describe('products query', () => {
   });
 
   it('keeps products available across remounts within the same query client', async () => {
-    mockedListProducts.mockResolvedValue([activeProductFixture]);
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([activeProductFixture]));
 
     const queryClient = createTestQueryClient();
     function Wrapper({ children }: PropsWithChildren) {
@@ -148,7 +170,9 @@ describe('products query', () => {
   });
 
   it('refetches products after explicit invalidation', async () => {
-    mockedListProducts.mockResolvedValueOnce([activeProductFixture]).mockResolvedValueOnce([inactiveProductFixture]);
+    mockedListProducts
+      .mockResolvedValueOnce(listProductsResponseFixture([activeProductFixture]))
+      .mockResolvedValueOnce(listProductsResponseFixture([inactiveProductFixture]));
 
     renderWithQueryClient(<ProductsInvalidationConsumer />);
 
@@ -163,6 +187,19 @@ describe('products query', () => {
     });
 
     expect(mockedListProducts).toHaveBeenCalledTimes(2);
+  });
+
+  it('passes pagination params through selected product queries', async () => {
+    mockedListProducts.mockResolvedValue(listProductsResponseFixture([activeProductFixture]));
+
+    renderWithQueryClient(<PaginatedProductTableRowsConsumer />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Chocolate Cake:12,99 €')).toBeInTheDocument();
+    });
+
+    expect(mockedListProducts).toHaveBeenCalledTimes(1);
+    expect(mockedListProducts).toHaveBeenCalledWith({ offset: 25, limit: 25 });
   });
 
   it('throws failed selector queries into the nearest error boundary', async () => {

@@ -6,7 +6,7 @@ import ProductsService, {
   selectProductOptions,
   selectProductsTableRows
 } from '@/services/ProductsService';
-import type { Product } from '@/types/Products';
+import type { ListProductsResponse, Product } from '@/types/Products';
 
 vi.mock('@/api/ProductsAPI', () => ({
   default: {
@@ -55,24 +55,63 @@ const inactiveProductFixture: Product = {
   allow_inhouse: false
 };
 
+function listProductsResponseFixture(products: Product[]): ListProductsResponse {
+  return {
+    data: products,
+    meta: {
+      offset: 0,
+      limit: products.length,
+      count: products.length,
+      total: products.length,
+      has_more: false,
+      next_offset: null
+    }
+  };
+}
+
 describe('ProductsService', () => {
   beforeEach(() => {
     mockedListProducts.mockReset();
   });
 
   it('loads products through the API layer', async () => {
-    mockedListProducts.mockResolvedValue([activeProductFixture]);
+    const response = listProductsResponseFixture([activeProductFixture]);
 
-    await expect(ProductsService.loadProducts()).resolves.toEqual([activeProductFixture]);
+    mockedListProducts.mockResolvedValue(response);
+
+    await expect(ProductsService.loadProducts()).resolves.toEqual(response);
     expect(mockedListProducts).toHaveBeenCalledTimes(1);
+    expect(mockedListProducts).toHaveBeenCalledWith();
+  });
+
+  it('loads searched products through the API layer', async () => {
+    const response = listProductsResponseFixture([activeProductFixture]);
+
+    mockedListProducts.mockResolvedValue(response);
+
+    await expect(ProductsService.loadProducts({ q: ' Chocolate ' })).resolves.toEqual(response);
+    expect(mockedListProducts).toHaveBeenCalledTimes(1);
+    expect(mockedListProducts).toHaveBeenCalledWith({ q: 'Chocolate' });
+  });
+
+  it('loads paginated products through the API layer', async () => {
+    const response = listProductsResponseFixture([activeProductFixture]);
+
+    mockedListProducts.mockResolvedValue(response);
+
+    await expect(ProductsService.loadProducts({ q: ' Chocolate ', offset: 25, limit: 25 })).resolves.toEqual(response);
+    expect(mockedListProducts).toHaveBeenCalledTimes(1);
+    expect(mockedListProducts).toHaveBeenCalledWith({ q: 'Chocolate', offset: 25, limit: 25 });
   });
 
   it('selects only active products', () => {
-    expect(selectActiveProducts([activeProductFixture, inactiveProductFixture])).toEqual([activeProductFixture]);
+    expect(selectActiveProducts(listProductsResponseFixture([activeProductFixture, inactiveProductFixture]))).toEqual([
+      activeProductFixture
+    ]);
   });
 
   it('maps products into select options', () => {
-    expect(selectProductOptions([activeProductFixture, inactiveProductFixture])).toEqual([
+    expect(selectProductOptions(listProductsResponseFixture([activeProductFixture, inactiveProductFixture]))).toEqual([
       {
         value: '1',
         label: 'Chocolate Cake',
@@ -87,7 +126,7 @@ describe('ProductsService', () => {
   });
 
   it('maps products into reusable table rows', () => {
-    expect(selectProductsTableRows([activeProductFixture])).toEqual([
+    expect(selectProductsTableRows(listProductsResponseFixture([activeProductFixture]))).toEqual([
       {
         id: '1',
         sku: 'PAP-001',
