@@ -5,6 +5,7 @@ import cx from 'classnames';
 
 import Button from '@/components/Button';
 
+import TableFooter from './TableFooter';
 import styles from './Table.module.css';
 import type { TableColumn, TableProps, TableSortState } from './type';
 import {
@@ -18,7 +19,6 @@ import {
 } from './utils';
 
 export default function Table<TData>({
-  caption,
   className = '',
   columns,
   data,
@@ -26,6 +26,7 @@ export default function Table<TData>({
   emptyMessage = 'No results found.',
   isLoading = false,
   onSortChange,
+  pagination,
   rowActions,
   rowKey,
   sortState,
@@ -71,8 +72,6 @@ export default function Table<TData>({
   return (
     <div className={cx(styles.TableWrapper, className)} data-testid="table-wrapper">
       <table className={cx(styles.Table, tableClassName)}>
-        {caption ? <caption className={styles.caption}>{caption}</caption> : null}
-
         <thead>
           <tr className={styles.headerRow}>
             {visibleColumns.map((column) => (
@@ -165,6 +164,8 @@ export default function Table<TData>({
             : null}
         </tbody>
       </table>
+
+      {pagination ? <TableFooter disabled={isLoading} pagination={pagination} /> : null}
     </div>
   );
 }

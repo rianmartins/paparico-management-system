@@ -1,65 +1,148 @@
 'use client';
 
-import { useProductsQuery } from './query';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useState } from 'react';
+
+import Button from '@/components/Button';
+import Input from '@/components/Input';
+import Table, { type TableColumn } from '@/components/Table';
+import { selectProductsTableRows } from '@/services/ProductsService';
+import type { ListProductsMeta, ListProductsResponse, ProductTableRow } from '@/types/Products';
+
+import { useProductsValue } from './query';
 
 import styles from './ProductList.module.css';
 
-function formatPrice(basePriceCents: number) {
-  return new Intl.NumberFormat('pt-PT', {
-    style: 'currency',
-    currency: 'EUR'
-  }).format(basePriceCents / 100);
-}
+const productColumns = [
+  {
+    id: 'name',
+    header: 'Name',
+    accessor: 'name'
+  },
+  {
+    id: 'sku',
+    header: 'SKU',
+    accessor: 'sku',
+    mobileVisibility: 'tablet'
+  },
+  {
+    id: 'price',
+    header: 'Price',
+    accessor: 'price',
+    align: 'right'
+  },
+  {
+    id: 'status',
+    header: 'Status',
+    accessor: 'status'
+  },
+  {
+    id: 'variants',
+    header: 'Variants',
+    accessor: 'variantsCount',
+    align: 'center',
+    mobileVisibility: 'tablet'
+  },
+  {
+    id: 'pickup',
+    header: 'Pickup',
+    accessor: 'allowPickup',
+    align: 'center',
+    mobileVisibility: 'desktop'
+  },
+  {
+    id: 'inhouse',
+    header: 'In-house',
+    accessor: 'allowInhouse',
+    align: 'center',
+    mobileVisibility: 'desktop'
+  }
+] satisfies readonly TableColumn<ProductTableRow>[];
 
-function formatIdentifier(value: bigint | string) {
-  return String(value);
+const PAGE_SIZE = 20;
+
+type ProductTableView = {
+  rows: ProductTableRow[];
+  meta: ListProductsMeta;
+};
+
+function selectProductTableView(productsResponse: ListProductsResponse): ProductTableView {
+  return {
+    rows: selectProductsTableRows(productsResponse),
+    meta: productsResponse.meta
+  };
 }
 
 export default function ProductList() {
-  const { data: products = [], isPending } = useProductsQuery();
+  const [searchValue, setSearchValue] = useState('');
+  const [submittedSearch, setSubmittedSearch] = useState('');
+  const [offset, setOffset] = useState(0);
+  const {
+    data: tableView,
+    isPending,
+    refetch
+  } = useProductsValue(selectProductTableView, {
+    q: submittedSearch,
+    offset,
+    limit: PAGE_SIZE
+  });
 
-  if (isPending) {
-    return <p className={styles.stateMessage}>Loading products...</p>;
+  function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
+    setSearchValue(event.target.value);
   }
 
-  if (products.length === 0) {
-    return <p className={styles.stateMessage}>No products available yet.</p>;
+  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const nextSearch = searchValue.trim();
+
+    if (nextSearch === submittedSearch) {
+      if (offset !== 0) {
+        setOffset(0);
+        return;
+      }
+
+      void refetch();
+      return;
+    }
+
+    setSubmittedSearch(nextSearch);
+    setOffset(0);
   }
 
   return (
-    <div className={styles.productsList}>
-      {products.map((product) => (
-        <article key={formatIdentifier(product.id)} className={styles.productCard}>
-          <div className={styles.productHeader}>
-            <div>
-              <p className={styles.productSku}>{product.sku ?? 'No SKU'}</p>
-              <h2>{product.name}</h2>
-            </div>
-            <span className={styles.productPrice}>{formatPrice(product.base_price_cents)}</span>
-          </div>
+    <div className={styles.productList}>
+      <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
+        <Input
+          containerClassName={styles.searchInput}
+          label="Search products"
+          name="product-search"
+          onChange={handleSearchChange}
+          placeholder="Search by name or SKU"
+          value={searchValue}
+        />
+        <Button className={styles.searchButton} type="submit">
+          Search
+        </Button>
+      </form>
 
-          <p className={styles.productDescription}>{product.description ?? 'No description available.'}</p>
-
-          <dl className={styles.productMeta}>
-            <div>
-              <dt>Status</dt>
-              <dd>{product.is_active ? 'Active' : 'Inactive'}</dd>
-            </div>
-            <div>
-              <dt>Variants</dt>
-              <dd>{product.product_variants.length}</dd>
-            </div>
-            <div>
-              <dt>Pickup</dt>
-              <dd>{product.allow_pickup ? 'Yes' : 'No'}</dd>
-            </div>
-            <div>
-              <dt>In-house</dt>
-              <dd>{product.allow_inhouse ? 'Yes' : 'No'}</dd>
-            </div>
-          </dl>
-        </article>
-      ))}
+      <Table<ProductTableRow>
+        columns={productColumns}
+        data={tableView?.rows ?? []}
+        emptyMessage="No products available yet."
+        isLoading={isPending}
+        pagination={
+          tableView
+            ? {
+                offset: tableView.meta.offset,
+                limit: tableView.meta.limit,
+                total: tableView.meta.total,
+                onPageChange: (nextPagination) => setOffset(nextPagination.offset)
+              }
+            : undefined
+        }
+        rowKey="id"
+      />
     </div>
   );
 }

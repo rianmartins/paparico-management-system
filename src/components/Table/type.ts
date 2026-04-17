@@ -25,6 +25,19 @@ export type TableRowAction<TData> = {
   disabled?: (row: TData) => boolean;
 };
 
+export type TablePaginationChange = {
+  page: number;
+  offset: number;
+  limit: number;
+};
+
+export type TablePaginationState = {
+  offset: number;
+  limit: number;
+  total: number;
+  onPageChange: (nextPagination: TablePaginationChange) => void;
+};
+
 export type TableProps<TData> = {
   data: readonly TData[];
   columns: readonly TableColumn<TData>[];
@@ -38,4 +51,5 @@ export type TableProps<TData> = {
   defaultSortState?: TableSortState | null;
   onSortChange?: (nextSort: TableSortState | null) => void;
   rowActions?: readonly TableRowAction<TData>[];
+  pagination?: TablePaginationState;
 };

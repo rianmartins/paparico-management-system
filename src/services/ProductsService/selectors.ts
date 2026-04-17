@@ -13,20 +13,20 @@ function formatProductPrice(basePriceCents: number) {
   return productPriceFormatter.format(basePriceCents / 100);
 }
 
-export function selectActiveProducts(products: ListProductsResponse): Product[] {
-  return products.filter((product) => product.is_active);
+export function selectActiveProducts(productsResponse: ListProductsResponse): Product[] {
+  return productsResponse.data.filter((product) => product.is_active);
 }
 
-export function selectProductOptions(products: ListProductsResponse): ProductOption[] {
-  return products.map((product) => ({
+export function selectProductOptions(productsResponse: ListProductsResponse): ProductOption[] {
+  return productsResponse.data.map((product) => ({
     value: formatProductIdentifier(product.id),
     label: product.name,
     disabled: !product.is_active
   }));
 }
 
-export function selectProductsTableRows(products: ListProductsResponse): ProductTableRow[] {
-  return products.map((product) => ({
+export function selectProductsTableRows(productsResponse: ListProductsResponse): ProductTableRow[] {
+  return productsResponse.data.map((product) => ({
     id: formatProductIdentifier(product.id),
     sku: product.sku ?? 'No SKU',
     name: product.name,

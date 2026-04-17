@@ -60,4 +60,22 @@ export type ProductTableRow = {
   allowInhouse: 'Yes' | 'No';
 };
 
-export type ListProductsResponse = Product[];
+export type ListProductsMeta = {
+  offset: number;
+  limit: number;
+  count: number;
+  total: number;
+  has_more: boolean;
+  next_offset: number | null;
+};
+
+export type ListProductsResponse = {
+  data: Product[];
+  meta: ListProductsMeta;
+};
+
+export type ListProductsParams = {
+  q?: string;
+  offset?: number;
+  limit?: number;
+};
