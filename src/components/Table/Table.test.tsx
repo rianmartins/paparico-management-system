@@ -89,6 +89,24 @@ describe('Table', () => {
     expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2);
   });
 
+  it('emits row click events and marks rows as interactive when configured', () => {
+    const handleRowClick = vi.fn();
+
+    render(<Table columns={columns} data={rows} onRowClick={handleRowClick} rowKey="id" />);
+
+    const productRow = screen.getByText('Chocolate Cake').closest('tr');
+
+    if (!productRow) {
+      throw new Error('Expected product row to render.');
+    }
+
+    expect(productRow.className).toContain(styles.interactiveBodyRow);
+
+    fireEvent.click(productRow);
+
+    expect(handleRowClick).toHaveBeenCalledWith(rows[0]);
+  });
+
   it('renders compact pagination and emits offset changes', () => {
     const handlePageChange = vi.fn();
 

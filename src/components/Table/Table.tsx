@@ -25,6 +25,7 @@ export default function Table<TData>({
   defaultSortState = null,
   emptyMessage = 'No results found.',
   isLoading = false,
+  onRowClick,
   onSortChange,
   pagination,
   rowActions,
@@ -129,7 +130,11 @@ export default function Table<TData>({
 
           {!isLoading
             ? sortedData.map((row) => (
-                <tr className={styles.bodyRow} key={getRowKey(row, rowKey)}>
+                <tr
+                  className={cx(styles.bodyRow, onRowClick ? styles.interactiveBodyRow : undefined)}
+                  key={getRowKey(row, rowKey)}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                >
                   {visibleColumns.map((column) => (
                     <td
                       className={cx(

@@ -52,6 +52,14 @@
   border-bottom: none;
 }
 
+.interactiveBodyRow {
+  cursor: pointer;
+}
+
+.interactiveBodyRow:hover {
+  background: var(--color-surface-soft);
+}
+
 .stateCell {
   color: var(--color-text-secondary-muted);
   font-size: var(--font-size-body-sm);
