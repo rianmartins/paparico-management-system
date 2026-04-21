@@ -26,6 +26,7 @@ const activeProductFixture: Product = {
   name: 'Chocolate Cake',
   description: 'Rich chocolate sponge cake.',
   base_price_cents: 1299,
+  tax_code: 'INT',
   tax_id: '2',
   weight_grams: 500,
   length_cm: 20,

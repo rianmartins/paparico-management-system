@@ -14,11 +14,17 @@ import ProductsModal from './ProductsModal';
 
 vi.mock('@/api/ProductsAPI', () => ({
   default: {
-    createProduct: vi.fn()
+    createProduct: vi.fn(),
+    updateProduct: vi.fn(),
+    saveProductVariants: vi.fn(),
+    deleteProductVariant: vi.fn()
   }
 }));
 
 const mockedCreateProduct = vi.mocked(ProductsAPI.createProduct);
+const mockedUpdateProduct = vi.mocked(ProductsAPI.updateProduct);
+const mockedSaveProductVariants = vi.mocked(ProductsAPI.saveProductVariants);
+const mockedDeleteProductVariant = vi.mocked(ProductsAPI.deleteProductVariant);
 
 const createdProductFixture: Product = {
   id: '3',
@@ -26,6 +32,7 @@ const createdProductFixture: Product = {
   name: 'Vanilla Cake',
   description: null,
   base_price_cents: 1299,
+  tax_code: 'NOR',
   tax_id: '1',
   weight_grams: null,
   length_cm: null,
@@ -42,6 +49,48 @@ const createdProductFixture: Product = {
   created_at: '2025-01-01T00:00:00.000Z',
   updated_at: '2025-01-01T00:00:00.000Z',
   product_variants: []
+};
+
+const editProductFixture: Product = {
+  ...createdProductFixture,
+  id: '9',
+  sku: 'PAP-009',
+  name: 'Chocolate Cake',
+  description: 'Rich chocolate cake.',
+  base_price_cents: 1395,
+  tax_code: 'RED',
+  tax_id: '3',
+  allow_pickup: false,
+  allow_inhouse: true,
+  allow_eurosender: true,
+  product_variants: [
+    {
+      id: '31',
+      product_id: '9',
+      variant_code: null,
+      flavor: 'Vanilla',
+      price_override_cents: null,
+      is_active: true,
+      allow_pickup: null,
+      allow_inhouse: null,
+      allow_eurosender: null,
+      external_toconline_product_id: null,
+      external_toconline_item_code: null
+    },
+    {
+      id: '32',
+      product_id: '9',
+      variant_code: null,
+      flavor: 'Chocolate',
+      price_override_cents: null,
+      is_active: true,
+      allow_pickup: null,
+      allow_inhouse: null,
+      allow_eurosender: null,
+      external_toconline_product_id: null,
+      external_toconline_item_code: null
+    }
+  ]
 };
 
 function TestProviders({ children }: { children: ReactNode }) {
@@ -115,6 +164,9 @@ describe('ProductsModal', () => {
     });
 
     mockedCreateProduct.mockReset();
+    mockedUpdateProduct.mockReset();
+    mockedSaveProductVariants.mockReset();
+    mockedDeleteProductVariant.mockReset();
   });
 
   afterEach(() => {
@@ -189,7 +241,7 @@ describe('ProductsModal', () => {
         value: ' Chocolate '
       }
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Remove variant 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete variant 1' }));
     fireEvent.click(screen.getByRole('button', { name: 'Create product' }));
 
     await waitFor(() => {
@@ -268,6 +320,158 @@ describe('ProductsModal', () => {
       expect(screen.getByRole('dialog', { name: 'Create product' })).toHaveAttribute('open');
     });
     expect(screen.getByLabelText('SKU')).toHaveValue('');
+  });
+
+  it('prefills the form when editing an existing product', () => {
+    renderProductsModal(<ProductsModal isOpen onClose={vi.fn()} product={editProductFixture} />);
+
+    expect(screen.getByRole('dialog', { name: 'Edit product' })).toHaveAttribute('open');
+    expect(screen.getByLabelText('SKU')).toHaveValue('PAP-009');
+    expect(screen.getByLabelText('Name')).toHaveValue('Chocolate Cake');
+    expect(screen.getByLabelText('Base price')).toHaveValue('13,95');
+    expect(screen.getByRole('combobox', { name: 'Tax rate' })).toHaveValue('RED');
+    expect(screen.getByLabelText('Pickup')).not.toBeChecked();
+    expect(screen.getByLabelText('In-house')).toBeChecked();
+    expect(screen.getByLabelText('Eurosender')).toBeChecked();
+    expect(screen.getByLabelText('Variant 1 flavor')).toHaveValue('Vanilla');
+    expect(screen.getByLabelText('Variant 2 flavor')).toHaveValue('Chocolate');
+    expect(screen.getByRole('button', { name: 'Update product' })).toBeInTheDocument();
+  });
+
+  it('updates a product with edited, added, and removed variants', async () => {
+    mockedUpdateProduct.mockResolvedValue({
+      ...editProductFixture,
+      name: 'Chocolate Celebration Cake'
+    });
+    mockedSaveProductVariants.mockResolvedValue(editProductFixture.product_variants);
+    mockedDeleteProductVariant.mockResolvedValue(undefined);
+
+    function ControlledProductsModal() {
+      const [isOpen, setIsOpen] = useState(true);
+
+      return <ProductsModal isOpen={isOpen} onClose={() => setIsOpen(false)} product={editProductFixture} />;
+    }
+
+    const { container, invalidateQueriesSpy } = renderProductsModal(<ControlledProductsModal />);
+
+    fireEvent.change(screen.getByLabelText('SKU'), {
+      target: {
+        value: ' PAP-009-EDIT '
+      }
+    });
+    fireEvent.change(screen.getByLabelText('Name'), {
+      target: {
+        value: ' Chocolate Celebration Cake '
+      }
+    });
+    fireEvent.change(screen.getByLabelText('Base price'), {
+      target: {
+        value: '14,50'
+      }
+    });
+    fireEvent.change(screen.getByLabelText('Tax rate'), {
+      target: {
+        value: 'INT'
+      }
+    });
+    fireEvent.click(screen.getByLabelText('Pickup'));
+    fireEvent.click(screen.getByLabelText('Eurosender'));
+    fireEvent.click(screen.getByRole('button', { name: 'Add variant' }));
+    fireEvent.change(screen.getByLabelText('Variant 3 flavor'), {
+      target: {
+        value: ' Strawberry '
+      }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Delete variant 1' }));
+
+    await waitFor(() => {
+      expect(mockedDeleteProductVariant).toHaveBeenCalledWith('9', 31);
+    });
+    await waitFor(() => {
+      expect(screen.getByLabelText('Variant 1 flavor')).toHaveValue('Chocolate');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Update product' }));
+
+    await waitFor(() => {
+      expect(mockedUpdateProduct).toHaveBeenCalledWith('9', {
+        sku: 'PAP-009-EDIT',
+        name: 'Chocolate Celebration Cake',
+        base_price_cents: 1450,
+        tax_code: 'INT',
+        allow_pickup: true,
+        allow_inhouse: true,
+        allow_eurosender: false
+      });
+    });
+    expect(mockedSaveProductVariants).toHaveBeenCalledWith('9', [
+      {
+        id: 32,
+        flavor: 'Chocolate'
+      },
+      {
+        flavor: 'Strawberry'
+      }
+    ]);
+
+    expect(await screen.findByText('The product has been updated.')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: productsQueryKey });
+      expect(container.querySelector('dialog')).not.toHaveAttribute('open');
+    });
+  });
+
+  it('shows API errors and keeps the modal open when update fails', async () => {
+    mockedUpdateProduct.mockRejectedValue(
+      new ApiError({
+        status: 500,
+        code: 'HTTP_500',
+        message: 'The server could not update this product.'
+      })
+    );
+    renderProductsModal(<ProductsModal isOpen onClose={vi.fn()} product={editProductFixture} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Update product' }));
+
+    expect(await screen.findByText('Unable to update product')).toBeInTheDocument();
+    expect(screen.getAllByText('The server could not update this product.').length).toBeGreaterThan(0);
+    expect(screen.getByRole('dialog', { name: 'Edit product' })).toHaveAttribute('open');
+  });
+
+  it('removes a newly added edit variant locally without calling the delete endpoint', async () => {
+    renderProductsModal(<ProductsModal isOpen onClose={vi.fn()} product={editProductFixture} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add variant' }));
+    fireEvent.change(screen.getByLabelText('Variant 3 flavor'), {
+      target: {
+        value: 'Strawberry'
+      }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Delete variant 3' }));
+
+    expect(mockedDeleteProductVariant).not.toHaveBeenCalled();
+    expect(screen.queryByLabelText('Variant 3 flavor')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Variant 1 flavor')).toHaveValue('Vanilla');
+    expect(screen.getByLabelText('Variant 2 flavor')).toHaveValue('Chocolate');
+  });
+
+  it('keeps an existing variant visible when deleting it fails', async () => {
+    mockedDeleteProductVariant.mockRejectedValue(
+      new ApiError({
+        status: 500,
+        code: 'HTTP_500',
+        message: 'The server could not delete this variant.'
+      })
+    );
+    renderProductsModal(<ProductsModal isOpen onClose={vi.fn()} product={editProductFixture} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete variant 1' }));
+
+    expect(await screen.findByText('Unable to delete variant')).toBeInTheDocument();
+    expect(screen.getAllByText('The server could not delete this variant.').length).toBeGreaterThan(0);
+    expect(screen.getByLabelText('Variant 1 flavor')).toHaveValue('Vanilla');
+    expect(screen.getByLabelText('Variant 2 flavor')).toHaveValue('Chocolate');
   });
 });
 

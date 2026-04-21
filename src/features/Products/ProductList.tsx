@@ -7,9 +7,10 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Table, { type TableColumn } from '@/components/Table';
 import { selectProductsTableRows } from '@/services/ProductsService';
-import type { ListProductsMeta, ListProductsResponse, ProductTableRow } from '@/types/Products';
+import type { ListProductsMeta, ListProductsResponse, Product, ProductTableRow } from '@/types/Products';
 
 import { useProductsValue } from './query';
+import ProductsModal from './ProductsModal';
 
 import styles from './ProductList.module.css';
 
@@ -63,12 +64,14 @@ const PAGE_SIZE = 20;
 
 type ProductTableView = {
   rows: ProductTableRow[];
+  products: Product[];
   meta: ListProductsMeta;
 };
 
 function selectProductTableView(productsResponse: ListProductsResponse): ProductTableView {
   return {
     rows: selectProductsTableRows(productsResponse),
+    products: productsResponse.data,
     meta: productsResponse.meta
   };
 }
@@ -77,6 +80,7 @@ export default function ProductList() {
   const [searchValue, setSearchValue] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [offset, setOffset] = useState(0);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const {
     data: tableView,
     isPending,
@@ -110,6 +114,14 @@ export default function ProductList() {
     setOffset(0);
   }
 
+  function handleRowClick(row: ProductTableRow) {
+    const product = tableView?.products.find((candidate) => String(candidate.id) === row.id);
+
+    if (product) {
+      setEditingProduct(product);
+    }
+  }
+
   return (
     <div className={styles.productList}>
       <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
@@ -131,6 +143,7 @@ export default function ProductList() {
         data={tableView?.rows ?? []}
         emptyMessage="No products available yet."
         isLoading={isPending}
+        onRowClick={handleRowClick}
         pagination={
           tableView
             ? {
@@ -143,6 +156,10 @@ export default function ProductList() {
         }
         rowKey="id"
       />
+
+      {editingProduct ? (
+        <ProductsModal isOpen onClose={() => setEditingProduct(null)} product={editingProduct} />
+      ) : null}
     </div>
   );
 }

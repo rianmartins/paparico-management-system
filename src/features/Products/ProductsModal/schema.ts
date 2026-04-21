@@ -20,6 +20,7 @@ export const createProductSchema = z.object({
   allow_eurosender: z.boolean(),
   product_variants: z.array(
     z.object({
+      variantId: z.number().int().min(1).optional(),
       flavor: z
         .string()
         .trim()

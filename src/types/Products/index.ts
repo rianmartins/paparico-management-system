@@ -21,6 +21,25 @@ export type CreateProductPayload = {
   product_variants?: CreateVariantPayload[];
 };
 
+export type UpsertProductVariantPayload = CreateVariantPayload & {
+  id?: number;
+};
+
+export type UpdateProductPayload = {
+  sku?: string;
+  name?: string;
+  base_price_cents?: number;
+  tax_code?: ProductTaxCode;
+  allow_pickup?: boolean;
+  allow_inhouse?: boolean;
+  allow_eurosender?: boolean;
+  description?: string;
+  weight_grams?: number;
+  length_cm?: number;
+  height_cm?: number;
+  width_cm?: number;
+};
+
 export type ProductVariant = {
   id: ProductBigInt;
   product_id: ProductBigInt;
@@ -41,6 +60,7 @@ export type Product = {
   name: string;
   description: string | null;
   base_price_cents: number;
+  tax_code: ProductTaxCode;
   tax_id: ProductBigInt;
   weight_grams: number | null;
   length_cm: number | null;

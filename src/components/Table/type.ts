@@ -51,5 +51,6 @@ export type TableProps<TData> = {
   defaultSortState?: TableSortState | null;
   onSortChange?: (nextSort: TableSortState | null) => void;
   rowActions?: readonly TableRowAction<TData>[];
+  onRowClick?: (row: TData) => void;
   pagination?: TablePaginationState;
 };
