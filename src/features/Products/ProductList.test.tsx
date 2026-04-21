@@ -171,7 +171,7 @@ describe('ProductList', () => {
     expect(within(table).queryAllByRole('button')).toHaveLength(0);
   });
 
-  it('opens the edit modal with current product values when a row is double-clicked', async () => {
+  it('opens the edit modal with current product values when a row is clicked', async () => {
     mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
 
     renderProductListWithToast();
@@ -186,7 +186,7 @@ describe('ProductList', () => {
       throw new Error('Expected product table row to render.');
     }
 
-    fireEvent.doubleClick(productRow);
+    fireEvent.click(productRow);
 
     expect(screen.getByRole('dialog', { name: 'Edit product' })).toHaveAttribute('open');
     expect(screen.getByLabelText('SKU')).toHaveValue('PAP-001');
@@ -216,7 +216,7 @@ describe('ProductList', () => {
       throw new Error('Expected product table row to render.');
     }
 
-    fireEvent.doubleClick(productRow);
+    fireEvent.click(productRow);
     fireEvent.change(screen.getByLabelText('Name'), {
       target: {
         value: ' Chocolate Celebration Cake '
