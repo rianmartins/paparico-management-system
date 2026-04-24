@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import productsStore from '@/store/ProductsStore';
 
 import ProductCreateAction from './ProductCreateAction';
 
@@ -15,6 +17,10 @@ vi.mock('./ProductsModal', () => ({
 }));
 
 describe('ProductCreateAction', () => {
+  beforeEach(() => {
+    productsStore.reset();
+  });
+
   it('opens and closes the create product modal', () => {
     render(<ProductCreateAction />);
 

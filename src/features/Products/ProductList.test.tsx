@@ -1,10 +1,10 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ProductsAPI from '@/api/ProductsAPI';
 import { ApiError } from '@/api/errors';
 import ToastProvider from '@/components/Toast/ToastProvider';
-import { renderWithQueryClient } from '@/test/renderWithQueryClient';
+import productsStore from '@/store/ProductsStore';
 import TestErrorBoundary from '@/test/TestErrorBoundary';
 import type { ListProductsMeta, ListProductsResponse, Product } from '@/types/Products';
 
@@ -97,8 +97,14 @@ function listProductsResponseFixture(
   };
 }
 
+function renderProductList() {
+  void productsStore.loadProducts();
+  return render(<ProductList />);
+}
+
 function renderProductListWithToast() {
-  return renderWithQueryClient(
+  void productsStore.loadProducts();
+  return render(
     <ToastProvider>
       <ProductList />
     </ToastProvider>
@@ -110,6 +116,7 @@ describe('ProductList', () => {
   const originalClose = HTMLDialogElement.prototype.close;
 
   beforeEach(() => {
+    productsStore.reset();
     mockedListProducts.mockReset();
     mockedUpdateProduct.mockReset();
     mockedSaveProductVariants.mockReset();
@@ -132,7 +139,7 @@ describe('ProductList', () => {
   it('renders the loading state before the request resolves', () => {
     mockedListProducts.mockReturnValue(new Promise(() => undefined));
 
-    renderWithQueryClient(<ProductList />);
+    renderProductList();
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -141,7 +148,7 @@ describe('ProductList', () => {
   it('renders products returned by the service in the table', async () => {
     mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
 
-    renderWithQueryClient(<ProductList />);
+    renderProductList();
 
     await waitFor(() => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
@@ -247,7 +254,7 @@ describe('ProductList', () => {
   it('renders the empty state when no products are returned', async () => {
     mockedListProducts.mockResolvedValue(listProductsResponseFixture([]));
 
-    renderWithQueryClient(<ProductList />);
+    renderProductList();
 
     await waitFor(() => {
       expect(screen.getByText('No products available yet.')).toBeInTheDocument();
@@ -259,7 +266,7 @@ describe('ProductList', () => {
       .mockResolvedValueOnce(listProductsResponseFixture([productFixture]))
       .mockResolvedValueOnce(listProductsResponseFixture([searchedProductFixture]));
 
-    renderWithQueryClient(<ProductList />);
+    renderProductList();
 
     await waitFor(() => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
@@ -307,7 +314,7 @@ describe('ProductList', () => {
         })
       );
 
-    renderWithQueryClient(<ProductList />);
+    renderProductList();
 
     await waitFor(() => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
@@ -334,7 +341,8 @@ describe('ProductList', () => {
       })
     );
 
-    renderWithQueryClient(
+    void productsStore.loadProducts();
+    render(
       <TestErrorBoundary fallback={<p>Products boundary fallback</p>}>
         <ProductList />
       </TestErrorBoundary>

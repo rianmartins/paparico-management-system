@@ -1,15 +1,15 @@
 'use client';
 
 import type { ChangeEvent, FormEvent } from 'react';
-import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
 
+import { isUnauthorizedApiError } from '@/api/errors';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Table, { type TableColumn } from '@/components/Table';
-import { selectProductsTableRows } from '@/services/ProductsService';
-import type { ListProductsMeta, ListProductsResponse, Product, ProductTableRow } from '@/types/Products';
+import productsStore from '@/store/ProductsStore';
+import type { ProductTableRow } from '@/types/Products';
 
-import { useProductsValue } from './query';
 import ProductsModal from './ProductsModal';
 
 import styles from './ProductList.module.css';
@@ -60,66 +60,25 @@ const productColumns = [
   }
 ] satisfies readonly TableColumn<ProductTableRow>[];
 
-const PAGE_SIZE = 20;
+const ProductList = observer(function ProductList() {
+  const store = productsStore;
 
-type ProductTableView = {
-  rows: ProductTableRow[];
-  products: Product[];
-  meta: ListProductsMeta;
-};
-
-function selectProductTableView(productsResponse: ListProductsResponse): ProductTableView {
-  return {
-    rows: selectProductsTableRows(productsResponse),
-    products: productsResponse.data,
-    meta: productsResponse.meta
-  };
-}
-
-export default function ProductList() {
-  const [searchValue, setSearchValue] = useState('');
-  const [submittedSearch, setSubmittedSearch] = useState('');
-  const [offset, setOffset] = useState(0);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const {
-    data: tableView,
-    isPending,
-    refetch
-  } = useProductsValue(selectProductTableView, {
-    q: submittedSearch,
-    offset,
-    limit: PAGE_SIZE
-  });
+  if (store.loadError && !isUnauthorizedApiError(store.loadError)) {
+    throw store.loadError;
+  }
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
-    setSearchValue(event.target.value);
+    store.setSearchValue(event.target.value);
   }
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    const nextSearch = searchValue.trim();
-
-    if (nextSearch === submittedSearch) {
-      if (offset !== 0) {
-        setOffset(0);
-        return;
-      }
-
-      void refetch();
-      return;
-    }
-
-    setSubmittedSearch(nextSearch);
-    setOffset(0);
+    store.submitSearch();
   }
 
   function handleRowClick(row: ProductTableRow) {
-    const product = tableView?.products.find((candidate) => String(candidate.id) === row.id);
-
-    if (product) {
-      setEditingProduct(product);
-    }
+    const product = store.products.find((p) => String(p.id) === row.id);
+    if (product) store.openEditModal(product);
   }
 
   return (
@@ -131,7 +90,7 @@ export default function ProductList() {
           name="product-search"
           onChange={handleSearchChange}
           placeholder="Search by name or SKU"
-          value={searchValue}
+          value={store.searchValue}
         />
         <Button className={styles.searchButton} type="submit">
           Search
@@ -140,26 +99,28 @@ export default function ProductList() {
 
       <Table<ProductTableRow>
         columns={productColumns}
-        data={tableView?.rows ?? []}
+        data={store.tableRows}
         emptyMessage="No products available yet."
-        isLoading={isPending}
+        isLoading={store.isLoading}
         onRowClick={handleRowClick}
         pagination={
-          tableView
+          store.meta
             ? {
-                offset: tableView.meta.offset,
-                limit: tableView.meta.limit,
-                total: tableView.meta.total,
-                onPageChange: (nextPagination) => setOffset(nextPagination.offset)
+                offset: store.meta.offset,
+                limit: store.meta.limit,
+                total: store.meta.total,
+                onPageChange: (nextPagination) => store.setOffset(nextPagination.offset)
               }
             : undefined
         }
         rowKey="id"
       />
 
-      {editingProduct ? (
-        <ProductsModal isOpen onClose={() => setEditingProduct(null)} product={editingProduct} />
+      {store.editingProduct ? (
+        <ProductsModal isOpen onClose={() => store.closeEditModal()} product={store.editingProduct} />
       ) : null}
     </div>
   );
-}
+});
+
+export default ProductList;

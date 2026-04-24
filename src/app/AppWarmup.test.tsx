@@ -1,12 +1,12 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useState } from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { observer } from 'mobx-react-lite';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AuthAPI from '@/api/AuthAPI';
 import ProductsAPI from '@/api/ProductsAPI';
 import AppProviders from '@/app/providers';
 import { clearStoredSession, persistSession } from '@/features/Auth/session';
-import { useProductsValue } from '@/features/Products';
+import productsStore from '@/store/ProductsStore';
 import type { AuthUser } from '@/types/Auth';
 import type { ListProductsResponse, Product } from '@/types/Products';
 
@@ -74,58 +74,31 @@ function listProductsResponseFixture(products: Product[]): ListProductsResponse 
   };
 }
 
-function ProductNameConsumer() {
-  const { data } = useProductsValue((productsResponse) =>
-    productsResponse.data.map((product) => product.name).join(', ')
-  );
-
-  return <p>{data ?? 'Loading products...'}</p>;
-}
-
-function DelayedProductConsumer() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  return (
-    <>
-      <button onClick={() => setIsVisible(true)} type="button">
-        Show products
-      </button>
-      {isVisible ? <ProductNameConsumer /> : null}
-    </>
-  );
-}
+const ProductNameConsumer = observer(function ProductNameConsumer() {
+  const names = productsStore.products.map((p) => p.name).join(', ');
+  return <p>{names || 'No products loaded'}</p>;
+});
 
 describe('AppWarmup', () => {
   beforeEach(() => {
+    productsStore.reset();
     mockedListProducts.mockReset();
     mockedMe.mockReset();
     clearStoredSession();
   });
 
-  it('does not prefetch protected product data before a consumer asks for it', async () => {
-    mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
-
+  it('does not prefetch product data or user when no session exists', () => {
     render(
       <AppProviders>
         <AppWarmup />
-        <DelayedProductConsumer />
       </AppProviders>
     );
 
     expect(mockedListProducts).not.toHaveBeenCalled();
     expect(mockedMe).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Show products' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
-    });
-
-    expect(mockedListProducts).toHaveBeenCalledTimes(1);
-    expect(mockedMe).not.toHaveBeenCalled();
   });
 
-  it('warms the products and current user queries once after an authenticated session is available', async () => {
+  it('warms the products store and current user query once after an authenticated session is available', async () => {
     mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
     mockedMe.mockResolvedValue(authUserFixture);
     persistSession({
@@ -137,7 +110,7 @@ describe('AppWarmup', () => {
     render(
       <AppProviders>
         <AppWarmup />
-        <DelayedProductConsumer />
+        <ProductNameConsumer />
       </AppProviders>
     );
 
@@ -146,12 +119,11 @@ describe('AppWarmup', () => {
       expect(mockedMe).toHaveBeenCalledTimes(1);
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Show products' }));
-
     await waitFor(() => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
     });
 
+    // Data is already in the store — consumers don't trigger additional requests
     expect(mockedListProducts).toHaveBeenCalledTimes(1);
     expect(mockedMe).toHaveBeenCalledTimes(1);
   });

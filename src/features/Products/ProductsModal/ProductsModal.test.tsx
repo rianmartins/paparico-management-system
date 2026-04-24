@@ -1,19 +1,18 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { useState, type ReactElement, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ProductsAPI from '@/api/ProductsAPI';
 import { ApiError } from '@/api/errors';
 import ToastProvider from '@/components/Toast/ToastProvider';
-import { productsQueryKey } from '@/features/Products/query';
-import { createTestQueryClient } from '@/test/createTestQueryClient';
+import productsStore from '@/store/ProductsStore';
 import type { Product } from '@/types/Products';
 
 import ProductsModal from './ProductsModal';
 
 vi.mock('@/api/ProductsAPI', () => ({
   default: {
+    listProducts: vi.fn(),
     createProduct: vi.fn(),
     updateProduct: vi.fn(),
     saveProductVariants: vi.fn(),
@@ -21,6 +20,7 @@ vi.mock('@/api/ProductsAPI', () => ({
   }
 }));
 
+const mockedListProducts = vi.mocked(ProductsAPI.listProducts);
 const mockedCreateProduct = vi.mocked(ProductsAPI.createProduct);
 const mockedUpdateProduct = vi.mocked(ProductsAPI.updateProduct);
 const mockedSaveProductVariants = vi.mocked(ProductsAPI.saveProductVariants);
@@ -94,27 +94,11 @@ const editProductFixture: Product = {
 };
 
 function TestProviders({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(createTestQueryClient);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>{children}</ToastProvider>
-    </QueryClientProvider>
-  );
+  return <ToastProvider>{children}</ToastProvider>;
 }
 
-function renderProductsModal(ui: ReactElement) {
-  const queryClient = createTestQueryClient();
-  const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-  return {
-    invalidateQueriesSpy,
-    ...render(
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>{ui}</ToastProvider>
-      </QueryClientProvider>
-    )
-  };
+function renderProductsModal(ui: React.ReactElement) {
+  return render(<ToastProvider>{ui}</ToastProvider>);
 }
 
 function fillRequiredProductFields({
@@ -155,6 +139,7 @@ describe('ProductsModal', () => {
   const originalClose = HTMLDialogElement.prototype.close;
 
   beforeEach(() => {
+    productsStore.reset();
     HTMLDialogElement.prototype.showModal = vi.fn(function showModal(this: HTMLDialogElement) {
       this.setAttribute('open', '');
     });
@@ -163,6 +148,10 @@ describe('ProductsModal', () => {
       this.removeAttribute('open');
     });
 
+    mockedListProducts.mockResolvedValue({
+      data: [],
+      meta: { offset: 0, limit: 20, count: 0, total: 0, has_more: false, next_offset: null }
+    });
     mockedCreateProduct.mockReset();
     mockedUpdateProduct.mockReset();
     mockedSaveProductVariants.mockReset();
@@ -286,7 +275,7 @@ describe('ProductsModal', () => {
     expect(screen.getByRole('dialog', { name: 'Create product' })).toHaveAttribute('open');
   });
 
-  it('resets, closes, and invalidates product queries after a successful creation', async () => {
+  it('resets, closes, and reloads products after a successful creation', async () => {
     mockedCreateProduct.mockResolvedValue(createdProductFixture);
 
     function ControlledProductsModal() {
@@ -302,7 +291,7 @@ describe('ProductsModal', () => {
       );
     }
 
-    const { container, invalidateQueriesSpy } = renderProductsModal(<ControlledProductsModal />);
+    const { container } = renderProductsModal(<ControlledProductsModal />);
 
     fillRequiredProductFields();
     fireEvent.click(screen.getByRole('button', { name: 'Create product' }));
@@ -310,7 +299,7 @@ describe('ProductsModal', () => {
     expect(await screen.findByText('The product has been created.')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: productsQueryKey });
+      expect(mockedListProducts).toHaveBeenCalled();
       expect(container.querySelector('dialog')).not.toHaveAttribute('open');
     });
 
@@ -352,7 +341,7 @@ describe('ProductsModal', () => {
       return <ProductsModal isOpen={isOpen} onClose={() => setIsOpen(false)} product={editProductFixture} />;
     }
 
-    const { container, invalidateQueriesSpy } = renderProductsModal(<ControlledProductsModal />);
+    const { container } = renderProductsModal(<ControlledProductsModal />);
 
     fireEvent.change(screen.getByLabelText('SKU'), {
       target: {
@@ -417,7 +406,7 @@ describe('ProductsModal', () => {
     expect(await screen.findByText('The product has been updated.')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: productsQueryKey });
+      expect(mockedListProducts).toHaveBeenCalled();
       expect(container.querySelector('dialog')).not.toHaveAttribute('open');
     });
   });

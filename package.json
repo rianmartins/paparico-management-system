@@ -26,6 +26,8 @@
     "@tanstack/react-query": "^5.96.0",
     "axios": "^1.13.6",
     "classnames": "^2.5.1",
+    "mobx": "^6.15.0",
+    "mobx-react-lite": "^4.1.1",
     "next": "16.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",

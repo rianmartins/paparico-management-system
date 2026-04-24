@@ -1,20 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
 
 import Button from '@/components/Button';
+import productsStore from '@/store/ProductsStore';
 
 import ProductsModal from './ProductsModal';
 
-export default function ProductCreateAction() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+const ProductCreateAction = observer(function ProductCreateAction() {
   return (
     <>
-      <Button aria-haspopup="dialog" onClick={() => setIsModalOpen(true)} type="button">
+      <Button aria-haspopup="dialog" onClick={productsStore.openCreateModal} type="button">
         Create product
       </Button>
-      <ProductsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ProductsModal isOpen={productsStore.isCreateModalOpen} onClose={productsStore.closeCreateModal} />
     </>
   );
-}
+});
+
+export default ProductCreateAction;

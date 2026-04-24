@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useFieldArray } from 'react-hook-form';
-import { useQueryClient } from '@tanstack/react-query';
 
-import ProductsAPI from '@/api/ProductsAPI';
 import { ApiError } from '@/api/errors';
 import Button from '@/components/Button';
 import Form, { FormErrorSummary, FormInput, FormSelect, applyFormApiErrors, useZodForm } from '@/components/Form';
 import Modal from '@/components/Modal';
 import useToast from '@/hooks/useToast';
+import productsStore from '@/store/ProductsStore';
 import type {
   CreateProductPayload,
   Product,
@@ -18,8 +17,6 @@ import type {
   UpdateProductPayload,
   UpsertProductVariantPayload
 } from '@/types/Products';
-
-import { productsQueryKey } from '../query';
 
 import { createProductSchema, type CreateProductFormValues } from './schema';
 import styles from './ProductsModal.module.css';
@@ -137,7 +134,6 @@ function getProductErrorMessage(error: unknown, defaultMessage: string) {
 }
 
 export default function ProductsModal({ isOpen, onClose, product = null }: ProductsModalProps) {
-  const [deletingVariantIds, setDeletingVariantIds] = useState<Set<string>>(() => new Set());
   const form = useZodForm(createProductSchema, {
     defaultValues: getDefaultFormValues(product)
   });
@@ -145,10 +141,9 @@ export default function ProductsModal({ isOpen, onClose, product = null }: Produ
     control: form.control,
     name: 'product_variants'
   });
-  const queryClient = useQueryClient();
   const toast = useToast();
   const isSubmitting = form.formState.isSubmitting;
-  const isDeletingVariant = deletingVariantIds.size > 0;
+  const isDeletingVariant = productsStore.isDeletingVariant;
   const isBusy = isSubmitting || isDeletingVariant;
   const { reset } = form;
   const isEditMode = Boolean(product);
@@ -159,7 +154,6 @@ export default function ProductsModal({ isOpen, onClose, product = null }: Produ
   useEffect(() => {
     if (isOpen) {
       reset(getDefaultFormValues(product));
-      setDeletingVariantIds(new Set());
     }
   }, [isOpen, product, reset]);
 
@@ -176,22 +170,6 @@ export default function ProductsModal({ isOpen, onClose, product = null }: Produ
     closeAndReset();
   }
 
-  function setVariantDeleting(variantId: ProductBigInt | number, isDeleting: boolean) {
-    const formattedVariantId = formatProductIdentifier(variantId);
-
-    setDeletingVariantIds((currentVariantIds) => {
-      const nextVariantIds = new Set(currentVariantIds);
-
-      if (isDeleting) {
-        nextVariantIds.add(formattedVariantId);
-      } else {
-        nextVariantIds.delete(formattedVariantId);
-      }
-
-      return nextVariantIds;
-    });
-  }
-
   async function handleDeleteVariant(index: number, variantId?: number) {
     if (!product || !variantId) {
       remove(index);
@@ -199,12 +177,9 @@ export default function ProductsModal({ isOpen, onClose, product = null }: Produ
     }
 
     form.clearErrors('root');
-    setVariantDeleting(variantId, true);
 
     try {
-      await ProductsAPI.deleteProductVariant(formatProductIdentifier(product.id), variantId);
-      remove(index);
-      await queryClient.invalidateQueries({ queryKey: productsQueryKey });
+      await productsStore.deleteVariant(formatProductIdentifier(product.id), variantId, () => remove(index));
     } catch (error) {
       const description = getProductErrorMessage(error, DEFAULT_DELETE_VARIANT_ERROR_MESSAGE);
 
@@ -215,8 +190,6 @@ export default function ProductsModal({ isOpen, onClose, product = null }: Produ
         title: 'Unable to delete variant',
         description
       });
-    } finally {
-      setVariantDeleting(variantId, false);
     }
   }
 
@@ -225,19 +198,15 @@ export default function ProductsModal({ isOpen, onClose, product = null }: Produ
 
     try {
       if (product) {
-        const productId = formatProductIdentifier(product.id);
-        const variants = createVariantsPayload(values);
-
-        await ProductsAPI.updateProduct(productId, createUpdatePayload(values));
-
-        if (variants.length > 0) {
-          await ProductsAPI.saveProductVariants(productId, variants);
-        }
+        await productsStore.updateProduct(
+          formatProductIdentifier(product.id),
+          createUpdatePayload(values),
+          createVariantsPayload(values)
+        );
       } else {
-        await ProductsAPI.createProduct(createPayload(values));
+        await productsStore.createProduct(createPayload(values));
       }
 
-      await queryClient.invalidateQueries({ queryKey: productsQueryKey });
       toast.success({
         title: product ? 'Product updated' : 'Product created',
         description: product ? 'The product has been updated.' : 'The product has been created.'
