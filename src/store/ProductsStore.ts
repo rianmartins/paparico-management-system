@@ -24,9 +24,6 @@ class ProductsStore {
   submittedSearch = '';
   offset = 0;
 
-  editingProduct: Product | null = null;
-  isCreateModalOpen = false;
-
   deletingVariantIds: Set<string> = new Set();
 
   constructor() {
@@ -76,22 +73,6 @@ class ProductsStore {
     void this.loadProducts();
   }
 
-  openEditModal(product: Product) {
-    this.editingProduct = product;
-  }
-
-  closeEditModal() {
-    this.editingProduct = null;
-  }
-
-  openCreateModal() {
-    this.isCreateModalOpen = true;
-  }
-
-  closeCreateModal() {
-    this.isCreateModalOpen = false;
-  }
-
   reset() {
     this._data = null;
     this._isLoading = false;
@@ -99,8 +80,6 @@ class ProductsStore {
     this.searchValue = '';
     this.submittedSearch = '';
     this.offset = 0;
-    this.editingProduct = null;
-    this.isCreateModalOpen = false;
     this.deletingVariantIds = new Set();
   }
 

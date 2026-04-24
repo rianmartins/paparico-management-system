@@ -1,6 +1,6 @@
 'use client';
 
-import type { ChangeEvent, FormEvent } from 'react';
+import { type ChangeEvent, type FormEvent } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { isUnauthorizedApiError } from '@/api/errors';
@@ -8,11 +8,13 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Table, { type TableColumn } from '@/components/Table';
 import productsStore from '@/store/ProductsStore';
-import type { ProductTableRow } from '@/types/Products';
-
-import ProductsModal from './ProductsModal';
+import type { Product, ProductTableRow } from '@/types/Products';
 
 import styles from './ProductList.module.css';
+
+type ProductListProps = {
+  onEditProduct: (product: Product) => void;
+};
 
 const productColumns = [
   {
@@ -60,7 +62,7 @@ const productColumns = [
   }
 ] satisfies readonly TableColumn<ProductTableRow>[];
 
-const ProductList = observer(function ProductList() {
+const ProductList = observer(function ProductList({ onEditProduct }: ProductListProps) {
   const store = productsStore;
 
   if (store.loadError && !isUnauthorizedApiError(store.loadError)) {
@@ -78,7 +80,7 @@ const ProductList = observer(function ProductList() {
 
   function handleRowClick(row: ProductTableRow) {
     const product = store.products.find((p) => String(p.id) === row.id);
-    if (product) store.openEditModal(product);
+    if (product) onEditProduct(product);
   }
 
   return (
@@ -115,10 +117,6 @@ const ProductList = observer(function ProductList() {
         }
         rowKey="id"
       />
-
-      {store.editingProduct ? (
-        <ProductsModal isOpen onClose={() => store.closeEditModal()} product={store.editingProduct} />
-      ) : null}
     </div>
   );
 });

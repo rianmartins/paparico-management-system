@@ -7,12 +7,12 @@ vi.mock('@/features/AppSidebar', () => ({
   default: () => <nav>Products navigation</nav>
 }));
 
-vi.mock('@/features/Products/ProductCreateAction', () => ({
-  default: () => <button type="button">Create product</button>
+vi.mock('@/features/Products/ProductList', () => ({
+  default: ({ onEditProduct }: { onEditProduct: () => void }) => <div>Products list</div>
 }));
 
-vi.mock('@/features/Products/ProductList', () => ({
-  default: () => <div>Products list</div>
+vi.mock('@/features/Products/ProductsModal', () => ({
+  default: () => null
 }));
 
 describe('ProductsPage', () => {

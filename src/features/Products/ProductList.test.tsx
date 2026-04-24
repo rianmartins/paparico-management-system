@@ -1,9 +1,8 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ProductsAPI from '@/api/ProductsAPI';
 import { ApiError } from '@/api/errors';
-import ToastProvider from '@/components/Toast/ToastProvider';
 import productsStore from '@/store/ProductsStore';
 import TestErrorBoundary from '@/test/TestErrorBoundary';
 import type { ListProductsMeta, ListProductsResponse, Product } from '@/types/Products';
@@ -12,17 +11,11 @@ import ProductList from './ProductList';
 
 vi.mock('@/api/ProductsAPI', () => ({
   default: {
-    listProducts: vi.fn(),
-    updateProduct: vi.fn(),
-    saveProductVariants: vi.fn(),
-    deleteProductVariant: vi.fn()
+    listProducts: vi.fn()
   }
 }));
 
 const mockedListProducts = vi.mocked(ProductsAPI.listProducts);
-const mockedUpdateProduct = vi.mocked(ProductsAPI.updateProduct);
-const mockedSaveProductVariants = vi.mocked(ProductsAPI.saveProductVariants);
-const mockedDeleteProductVariant = vi.mocked(ProductsAPI.deleteProductVariant);
 
 const productFixture: Product = {
   id: '1',
@@ -97,43 +90,20 @@ function listProductsResponseFixture(
   };
 }
 
-function renderProductList() {
+function renderProductList(onEditProduct = vi.fn()) {
   void productsStore.loadProducts();
-  return render(<ProductList />);
-}
-
-function renderProductListWithToast() {
-  void productsStore.loadProducts();
-  return render(
-    <ToastProvider>
-      <ProductList />
-    </ToastProvider>
-  );
+  return render(<ProductList onEditProduct={onEditProduct} />);
 }
 
 describe('ProductList', () => {
-  const originalShowModal = HTMLDialogElement.prototype.showModal;
-  const originalClose = HTMLDialogElement.prototype.close;
-
   beforeEach(() => {
     productsStore.reset();
     mockedListProducts.mockReset();
-    mockedUpdateProduct.mockReset();
-    mockedSaveProductVariants.mockReset();
-    mockedDeleteProductVariant.mockReset();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    HTMLDialogElement.prototype.showModal = vi.fn(function showModal(this: HTMLDialogElement) {
-      this.setAttribute('open', '');
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function close(this: HTMLDialogElement) {
-      this.removeAttribute('open');
-    });
   });
 
   afterEach(() => {
     vi.mocked(console.error).mockRestore();
-    HTMLDialogElement.prototype.showModal = originalShowModal;
-    HTMLDialogElement.prototype.close = originalClose;
   });
 
   it('renders the loading state before the request resolves', () => {
@@ -178,10 +148,11 @@ describe('ProductList', () => {
     expect(within(table).queryAllByRole('button')).toHaveLength(0);
   });
 
-  it('opens the edit modal with current product values when a row is clicked', async () => {
+  it('calls onEditProduct with the correct product when a row is clicked', async () => {
     mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
+    const onEditProduct = vi.fn();
 
-    renderProductListWithToast();
+    renderProductList(onEditProduct);
 
     await waitFor(() => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
@@ -195,60 +166,8 @@ describe('ProductList', () => {
 
     fireEvent.click(productRow);
 
-    expect(screen.getByRole('dialog', { name: 'Edit product' })).toHaveAttribute('open');
-    expect(screen.getByLabelText('SKU')).toHaveValue('PAP-001');
-    expect(screen.getByLabelText('Name')).toHaveValue('Chocolate Cake');
-    expect(screen.getByLabelText('Base price')).toHaveValue('12,99');
-    expect(screen.getByRole('combobox', { name: 'Tax rate' })).toHaveValue('INT');
-    expect(screen.getByLabelText('Pickup')).toBeChecked();
-    expect(screen.getByLabelText('In-house')).toBeChecked();
-    expect(screen.getByLabelText('Eurosender')).not.toBeChecked();
-  });
-
-  it('updates a product from the row edit modal and closes it on success', async () => {
-    mockedListProducts.mockResolvedValue(listProductsResponseFixture([productFixture]));
-    mockedUpdateProduct.mockResolvedValue({
-      ...productFixture,
-      name: 'Chocolate Celebration Cake'
-    });
-    const { container } = renderProductListWithToast();
-
-    await waitFor(() => {
-      expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
-    });
-
-    const productRow = screen.getByText('Chocolate Cake').closest('tr');
-
-    if (!productRow) {
-      throw new Error('Expected product table row to render.');
-    }
-
-    fireEvent.click(productRow);
-    fireEvent.change(screen.getByLabelText('Name'), {
-      target: {
-        value: ' Chocolate Celebration Cake '
-      }
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'Update product' }));
-
-    await waitFor(() => {
-      expect(mockedUpdateProduct).toHaveBeenCalledWith('1', {
-        sku: 'PAP-001',
-        name: 'Chocolate Celebration Cake',
-        base_price_cents: 1299,
-        tax_code: 'INT',
-        allow_pickup: true,
-        allow_inhouse: true,
-        allow_eurosender: false
-      });
-    });
-    expect(mockedSaveProductVariants).not.toHaveBeenCalled();
-
-    expect(await screen.findByText('The product has been updated.')).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(container.querySelector('dialog')).not.toBeInTheDocument();
-    });
+    expect(onEditProduct).toHaveBeenCalledOnce();
+    expect(onEditProduct).toHaveBeenCalledWith(productFixture);
   });
 
   it('renders the empty state when no products are returned', async () => {
@@ -344,7 +263,7 @@ describe('ProductList', () => {
     void productsStore.loadProducts();
     render(
       <TestErrorBoundary fallback={<p>Products boundary fallback</p>}>
-        <ProductList />
+        <ProductList onEditProduct={vi.fn()} />
       </TestErrorBoundary>
     );
 
