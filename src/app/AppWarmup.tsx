@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { currentUserQueryKey, currentUserQueryOptions } from '@/features/Auth/query';
 import { hasStoredSession, subscribeToStoredSession } from '@/features/Auth/session';
-import { productsQueryKey, productsQueryOptions } from '@/features/Products';
+import productsStore from '@/store/ProductsStore';
 
 export default function AppWarmup() {
   const queryClient = useQueryClient();
@@ -14,12 +14,12 @@ export default function AppWarmup() {
   useEffect(() => {
     if (isAuthenticated) {
       void queryClient.prefetchQuery(currentUserQueryOptions);
-      void queryClient.prefetchQuery(productsQueryOptions);
+      void productsStore.loadProducts();
       return;
     }
 
     queryClient.removeQueries({ queryKey: currentUserQueryKey });
-    queryClient.removeQueries({ queryKey: productsQueryKey });
+    productsStore.reset();
   }, [isAuthenticated, queryClient]);
 
   return null;

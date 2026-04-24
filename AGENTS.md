@@ -19,7 +19,9 @@ This project uses a strict separation of concerns. Keep code in the narrowest la
 - `src/components`
   Shared, reusable UI components that are agnostic to business rules and entity-specific behavior.
 - `src/features`
-  Business-facing UI and feature logic. Example: `Products/ProductList`, `Auth/LoginForm`, auth session helpers, feature query hooks.
+  Business-facing UI components. They observe domain stores and call store actions — no business logic lives inside the components.
+- `src/store`
+  Observable domain state and operations (MobX). One store per domain. Owns loading state, server data, UI state, and all mutation actions (create, update, delete). Delegates raw HTTP calls to `src/api` and transformations to `src/services`.
 - `src/services`
   Entity-focused transformation and orchestration layer. Services may call APIs and expose reusable entity-level shaping/selectors for multiple features.
 - `src/types`
@@ -50,6 +52,11 @@ This project uses a strict separation of concerns. Keep code in the narrowest la
   - `export class ProductsService { ... }`
   - `const productsService = new ProductsService()`
   - `export default productsService`
+- Store modules follow the same singleton pattern and use MobX:
+  - `class ProductsStore { constructor() { makeAutoObservable(this, {}, { autoBind: true }); } }`
+  - `const productsStore = new ProductsStore()`
+  - `export default productsStore`
+  - Feature components wrap with `observer()` and import the singleton directly
 - Feature components should be colocated with their CSS, tests, and feature-only helpers.
 
 ## Testing
