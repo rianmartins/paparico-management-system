@@ -8,7 +8,7 @@ vi.mock('@/features/AppSidebar', () => ({
 }));
 
 vi.mock('@/features/Products/ProductList', () => ({
-  default: ({ onEditProduct }: { onEditProduct: () => void }) => <div>Products list</div>
+  default: (_props: { onEditProduct: () => void }) => <div>Products list</div>
 }));
 
 vi.mock('@/features/Products/ProductsModal', () => ({
