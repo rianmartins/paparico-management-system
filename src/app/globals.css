@@ -1,9 +1,9 @@
 :root {
   /* Core theme colors */
-  --color-primary: #1f4fd1;
-  --color-primary-hover: #173da5;
+  --color-primary: #31405e;
+  --color-primary-hover: #273350;
   --color-secondary: #17305f;
-  --color-background: #ffffff;
+  --color-background: #f2f2f2;
   --color-accent: #7f5a3a;
 
   /* Text colors */
@@ -26,7 +26,6 @@
 
   /* Surfaces */
   --color-surface-default: var(--color-background);
-  --color-surface-elevated: rgba(255, 255, 255, 0.92);
   --color-surface-overlay: rgba(255, 255, 255, 0.8);
   --color-surface-muted: #f4f6fb;
   --color-surface-soft: #f8faff;
@@ -72,13 +71,14 @@
   --color-page-radial-strong: rgba(215, 240, 228, 0.92);
   --color-page-radial-accent: rgba(201, 178, 151, 0.18);
   --color-modal-backdrop: rgba(13, 28, 61, 0.46);
+  --color-modal-background: #fafafa;
 
   /* Shadow colors */
-  --color-shadow-primary: rgba(31, 79, 209, 0.24);
-  --color-shadow-primary-ring: rgba(31, 79, 209, 0.18);
-  --color-shadow-primary-ring-soft: rgba(31, 79, 209, 0.16);
-  --color-shadow-primary-ring-subtle: rgba(31, 79, 209, 0.14);
-  --color-shadow-primary-ring-xs: rgba(31, 79, 209, 0.12);
+  --color-shadow-primary: rgba(49, 64, 94, 0.28);
+  --color-shadow-primary-ring: rgba(49, 64, 94, 0.2);
+  --color-shadow-primary-ring-soft: rgba(49, 64, 94, 0.16);
+  --color-shadow-primary-ring-subtle: rgba(49, 64, 94, 0.14);
+  --color-shadow-primary-ring-xs: rgba(49, 64, 94, 0.12);
   --color-shadow-danger-ring: rgba(209, 67, 67, 0.14);
   --color-shadow-contrast: rgba(29, 29, 27, 0.18);
   --color-shadow-contrast-ring: rgba(29, 29, 27, 0.12);

@@ -43,7 +43,7 @@ describe('LoginForm', () => {
   it('validates required fields before submitting', async () => {
     renderLoginForm();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(await screen.findByText('Email is required.')).toBeInTheDocument();
     expect(screen.getByText('Password is required.')).toBeInTheDocument();
@@ -64,12 +64,12 @@ describe('LoginForm', () => {
         value: 'manager@paparico.pt'
       }
     });
-    fireEvent.change(screen.getByLabelText('Password'), {
+    fireEvent.change(screen.getByLabelText('Senha'), {
       target: {
         value: 'secret'
       }
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => {
       expect(mockedLogin).toHaveBeenCalledWith({
@@ -101,12 +101,12 @@ describe('LoginForm', () => {
         value: 'manager@paparico.pt'
       }
     });
-    fireEvent.change(screen.getByLabelText('Password'), {
+    fireEvent.change(screen.getByLabelText('Senha'), {
       target: {
         value: 'secret'
       }
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(await screen.findByText('This account could not be found.')).toBeInTheDocument();
     expect(routerReplaceMock).not.toHaveBeenCalled();
@@ -122,15 +122,15 @@ describe('LoginForm', () => {
         value: 'manager@paparico.pt'
       }
     });
-    fireEvent.change(screen.getByLabelText('Password'), {
+    fireEvent.change(screen.getByLabelText('Senha'), {
       target: {
         value: 'secret'
       }
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Signing in...' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Entrando...' })).toBeDisabled();
     });
   });
 });

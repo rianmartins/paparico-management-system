@@ -35,6 +35,7 @@ export type FormInputProps<TFieldValues extends FieldValues> = Omit<InputProps, 
 };
 
 export default function FormInput<TFieldValues extends FieldValues>({
+  leftIcon,
   name,
   onBlur,
   onChange,
@@ -50,6 +51,7 @@ export default function FormInput<TFieldValues extends FieldValues>({
       {...props}
       {...registration}
       error={error?.message}
+      leftIcon={leftIcon}
       onBlur={createInputBlurHandler(registration.onBlur, onBlur)}
       onChange={createInputChangeHandler(registration.onChange, onChange)}
       ref={ref}
