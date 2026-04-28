@@ -1,50 +1,27 @@
 .loginGrid {
   display: grid;
   min-height: 100%;
-  text-align: center;
+  place-items: center;
 }
 
 .loginCard {
   display: flex;
   flex-direction: column;
-  max-width: 500px;
+  width: 100%;
+  max-width: 520px;
   margin: auto;
-  align-self: center;
-  gap: 20px;
-  padding: 32px;
-  border-radius: 28px;
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--color-border-contrast);
-  box-shadow: 0 18px 60px var(--color-shadow-warm-md);
-}
-
-.loginHeader {
-  display: grid;
-  gap: 10px;
-}
-
-.loginHeader h2 {
-  margin: 6px 0 0;
-  font-size: var(--font-size-h2);
-}
-
-.eyebrow {
-  margin: 0;
-  font-size: var(--font-size-label);
-  font-weight: 700;
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
-  color: var(--color-text-accent);
-}
-
-.loginCopy {
-  margin: 0;
-  color: var(--color-text-subtle);
+  gap: 44px;
+  padding: 48px 44px 40px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07),
+    0 20px 60px -12px rgba(0, 0, 0, 0.12);
 }
 
 .loginForm {
   display: grid;
-  gap: 16px;
+  gap: 20px;
 }
 
 .loginFields {
@@ -54,10 +31,39 @@
 
 .loginSubmit {
   width: 100%;
+  min-height: 3rem;
+  margin-top: 44px;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-@media (max-width: 768px) {
+.loginFooter {
+  margin: 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-subtle);
+}
+
+.loginFooterLink {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text-strong);
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 600px) {
   .loginCard {
-    padding: 20px;
+    padding: 32px 24px 28px;
+    border-radius: 16px;
+    box-shadow: none;
   }
 }

@@ -9,7 +9,7 @@ import Button from '@/components/Button';
 import styles from './Modal.module.css';
 
 export type ModalProps = {
-  title: ReactNode;
+  title?: ReactNode;
   isOpen: boolean;
   children?: ReactNode;
   showCloseButton?: boolean;
@@ -83,25 +83,30 @@ export default function Modal({
   return (
     <dialog
       aria-labelledby={titleId}
-      className={cx(styles.Modal, dialogClassName, className)}
+      className={cx(styles.Modal, dialogClassName)}
       onCancel={(event) => {
         event.preventDefault();
         onClose?.();
       }}
       ref={dialogRef}
     >
-      <div className={styles.content}>
-        <header className={styles.header}>
-          <h2 className={styles.title} id={titleId}>
-            {title}
-          </h2>
+      <div className={cx(styles.content, className)}>
+        {title ||
+          (showCloseButton && (
+            <header className={styles.header}>
+              {title && (
+                <h2 className={styles.title} id={titleId}>
+                  {title}
+                </h2>
+              )}
 
-          {showCloseButton ? (
-            <button aria-label="Close modal" className={styles.closeButton} onClick={onClose} type="button">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          ) : null}
-        </header>
+              {showCloseButton ? (
+                <button aria-label="Close modal" className={styles.closeButton} onClick={onClose} type="button">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              ) : null}
+            </header>
+          ))}
 
         <div className={styles.body}>{children}</div>
 

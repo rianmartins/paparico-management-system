@@ -7,16 +7,18 @@ import Button from '@/components/Button';
 import Form, { FormErrorSummary, FormInput, applyFormApiErrors, useZodForm } from '@/components/Form';
 import Modal from '@/components/Modal';
 import useToast from '@/hooks/useToast';
+import LockIcon from '@/icons/LockIcon';
 
 import { requiredPasswordUpdateSchema } from './schema';
 import { markPasswordUpdateComplete } from './session';
+import LoginHeader from './LoginHeader';
 import styles from './RequiredPasswordUpdateModal.module.css';
 
 export type RequiredPasswordUpdateModalProps = {
   isOpen: boolean;
 };
 
-const DEFAULT_ERROR_MESSAGE = 'We could not update your password. Try again.';
+const DEFAULT_ERROR_MESSAGE = 'Não foi possível atualizar sua senha. Tente novamente.';
 
 function getPasswordUpdateErrorMessage(error: unknown) {
   if (error instanceof ApiError && error.message.length > 0) {
@@ -46,8 +48,8 @@ export default function RequiredPasswordUpdateModal({ isOpen }: RequiredPassword
       });
       form.reset();
       toast.success({
-        title: 'Password updated',
-        description: 'Your password has been updated.'
+        title: 'Senha atualizada',
+        description: 'Sua senha foi atualizada com sucesso.'
       });
       markPasswordUpdateComplete();
     } catch (error) {
@@ -57,37 +59,38 @@ export default function RequiredPasswordUpdateModal({ isOpen }: RequiredPassword
         defaultMessage: description
       });
       toast.error({
-        title: 'Unable to update password',
+        title: 'Erro ao atualizar senha',
         description
       });
     }
   };
 
   return (
-    <Modal dialogClassName={styles.dialog} isOpen={isOpen} showCloseButton={false} title="Update your password">
-      <div className={styles.intro}>
-        <p className={styles.copy}>Choose a new password to continue.</p>
-      </div>
+    <Modal dialogClassName={styles.dialog} className={styles.modal} isOpen={isOpen} showCloseButton={false}>
+      <LoginHeader />
 
       <Form className={styles.form} form={form} onSubmit={handleSubmit}>
         <div className={styles.fields}>
           <FormInput<RequiredPasswordUpdateFormValues>
-            label="Current password"
+            label="Senha atual"
             name="currentPassword"
-            placeholder="Enter your current password"
+            leftIcon={<LockIcon />}
+            placeholder="Digite sua senha atual"
             type="password"
           />
           <FormInput<RequiredPasswordUpdateFormValues>
-            hint="Use at least 6 characters."
-            label="New password"
+            hint="Use pelo menos 6 caracteres."
+            label="Nova senha"
+            leftIcon={<LockIcon />}
             name="newPassword"
-            placeholder="Enter your new password"
+            placeholder="Digite sua nova senha"
             type="password"
           />
           <FormInput<RequiredPasswordUpdateFormValues>
-            label="Confirm new password"
+            label="Confirmar nova senha"
             name="newPasswordConfirmation"
-            placeholder="Confirm your new password"
+            leftIcon={<LockIcon />}
+            placeholder="Confirme sua nova senha"
             type="password"
           />
         </div>
@@ -95,7 +98,7 @@ export default function RequiredPasswordUpdateModal({ isOpen }: RequiredPassword
         <FormErrorSummary form={form} />
 
         <Button className={styles.submitButton} disabled={form.formState.isSubmitting} type="submit">
-          {form.formState.isSubmitting ? 'Updating password...' : 'Update password'}
+          {form.formState.isSubmitting ? 'Atualizando...' : 'Atualizar senha'}
         </Button>
       </Form>
     </Modal>

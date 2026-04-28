@@ -6,9 +6,12 @@ import AuthAPI from '@/api/AuthAPI';
 import Button from '@/components/Button';
 import Form, { FormErrorSummary, FormInput, applyFormApiErrors, useZodForm } from '@/components/Form';
 import useToast from '@/hooks/useToast';
+import EnvelopeIcon from '@/icons/EnvelopeIcon';
+import LockIcon from '@/icons/LockIcon';
 import type { LoginCredentials } from '@/types/Auth';
 
 import { loginSchema } from './schema';
+import LoginHeader from './LoginHeader';
 import styles from './LoginForm.module.css';
 
 export type LoginFormProps = {
@@ -43,37 +46,38 @@ export default function LoginForm({ redirectsTo }: LoginFormProps) {
   return (
     <div className={styles.loginGrid}>
       <section className={styles.loginCard}>
-        <div className={styles.loginHeader}>
-          <div>
-            <p className={styles.eyebrow}>Account access</p>
-            <h2>Sign in</h2>
-          </div>
-          <p className={styles.loginCopy}>Use your Paparico credentials to continue to the management dashboard.</p>
-        </div>
+        <LoginHeader />
 
         <Form className={styles.loginForm} form={form} onSubmit={handleSubmit}>
           <div className={styles.loginFields}>
             <FormInput<LoginCredentials>
               autoComplete="email"
-              hint="Use the email address registered for your Paparico access."
               label="Email"
+              leftIcon={<EnvelopeIcon />}
               name="email"
-              placeholder="manager@paparico.pt"
+              placeholder="email@exemplo.com"
               type="email"
             />
             <FormInput<LoginCredentials>
               autoComplete="current-password"
-              hint="Your password is never stored in the browser."
-              label="Password"
+              label="Senha"
+              leftIcon={<LockIcon />}
               name="password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               type="password"
             />
           </div>
           <FormErrorSummary form={form} />
           <Button className={styles.loginSubmit} disabled={form.formState.isSubmitting} type="submit">
-            {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
+            {form.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
           </Button>
+          <p className={styles.loginFooter}>
+            Esqueceu a senha?{' '}
+            <button className={styles.loginFooterLink} type="button">
+              Click aqui para alterar
+            </button>
+            .
+          </p>
         </Form>
       </section>
     </div>

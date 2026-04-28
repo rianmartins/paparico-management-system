@@ -16,6 +16,7 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: ReactNode;
   inputClassName?: string;
   containerClassName?: string;
+  leftIcon?: ReactNode;
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -30,6 +31,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     inputClassName = '',
     label,
     labelProps,
+    leftIcon,
     required,
     type = 'text',
     ...props
@@ -47,18 +49,34 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       labelProps={labelProps}
       required={required}
     >
-      {({ describedBy, fieldId, hasError }) => (
-        <input
-          {...props}
-          aria-describedby={describedBy}
-          aria-invalid={hasError ? true : ariaInvalid}
-          className={cx(styles.Input, { [styles.error]: hasError }, className, inputClassName)}
-          id={fieldId}
-          ref={ref}
-          required={required}
-          type={type}
-        />
-      )}
+      {({ describedBy, fieldId, hasError }) => {
+        const input = (
+          <input
+            {...props}
+            aria-describedby={describedBy}
+            aria-invalid={hasError ? true : ariaInvalid}
+            className={cx(
+              styles.Input,
+              { [styles.hasIcon]: leftIcon, [styles.error]: hasError },
+              className,
+              inputClassName
+            )}
+            id={fieldId}
+            ref={ref}
+            required={required}
+            type={type}
+          />
+        );
+
+        return leftIcon ? (
+          <div className={styles.inputWrapper}>
+            <span className={styles.icon}>{leftIcon}</span>
+            {input}
+          </div>
+        ) : (
+          input
+        );
+      }}
     </Field>
   );
 });
