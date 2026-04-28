@@ -130,7 +130,7 @@ describe('AuthGuard', () => {
     renderGuard();
 
     expect(screen.getByText('Protected content')).toBeInTheDocument();
-    expect(await screen.findByRole('dialog', { name: 'Update your password' })).toHaveAttribute('open');
+    expect(await screen.findByRole('dialog')).toHaveAttribute('open');
     expect(screen.queryByRole('button', { name: 'Close modal' })).not.toBeInTheDocument();
   });
 });

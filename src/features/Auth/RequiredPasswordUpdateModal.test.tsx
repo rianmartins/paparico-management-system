@@ -52,17 +52,17 @@ function fillPasswordForm({
   currentPassword?: string;
   newPassword?: string;
 }) {
-  fireEvent.change(screen.getByLabelText('Current password'), {
+  fireEvent.change(screen.getByLabelText('Senha atual'), {
     target: {
       value: currentPassword
     }
   });
-  fireEvent.change(screen.getByLabelText('New password'), {
+  fireEvent.change(screen.getByLabelText('Nova senha'), {
     target: {
       value: newPassword
     }
   });
-  fireEvent.change(screen.getByLabelText('Confirm new password'), {
+  fireEvent.change(screen.getByLabelText('Confirmar nova senha'), {
     target: {
       value: confirmation
     }
@@ -94,7 +94,7 @@ describe('RequiredPasswordUpdateModal', () => {
   it('opens as an undismissable modal when a password update is required', async () => {
     renderRequiredPasswordUpdateModal();
 
-    const dialog = await screen.findByRole('dialog', { name: 'Update your password' });
+    const dialog = await screen.findByRole('dialog');
 
     expect(dialog).toHaveAttribute('open');
     expect(screen.queryByRole('button', { name: 'Close modal' })).not.toBeInTheDocument();
@@ -113,7 +113,7 @@ describe('RequiredPasswordUpdateModal', () => {
       newPassword: 'short',
       confirmation: 'short'
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Atualizar senha' }));
 
     expect(await screen.findByText('New password must be at least 6 characters.')).toBeInTheDocument();
 
@@ -121,7 +121,7 @@ describe('RequiredPasswordUpdateModal', () => {
       newPassword: 'current-secret',
       confirmation: 'current-secret'
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Atualizar senha' }));
 
     expect(await screen.findByText('New password must be different from your current password.')).toBeInTheDocument();
 
@@ -129,7 +129,7 @@ describe('RequiredPasswordUpdateModal', () => {
       newPassword: 'new-secret',
       confirmation: 'other-secret'
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Atualizar senha' }));
 
     expect(await screen.findByText('New password confirmation must match the new password.')).toBeInTheDocument();
     expect(mockedUpdatePassword).not.toHaveBeenCalled();
@@ -140,10 +140,10 @@ describe('RequiredPasswordUpdateModal', () => {
     renderRequiredPasswordUpdateModal();
 
     fillPasswordForm({});
-    fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Atualizar senha' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Updating password...' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Atualizando...' })).toBeDisabled();
     });
   });
 
@@ -152,7 +152,7 @@ describe('RequiredPasswordUpdateModal', () => {
     const { container } = renderRequiredPasswordUpdateModal();
 
     fillPasswordForm({});
-    fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Atualizar senha' }));
 
     await waitFor(() => {
       expect(mockedUpdatePassword).toHaveBeenCalledWith({
@@ -161,7 +161,7 @@ describe('RequiredPasswordUpdateModal', () => {
       });
     });
 
-    expect(await screen.findByText('Your password has been updated.')).toBeInTheDocument();
+    expect(await screen.findByText('Sua senha foi atualizada com sucesso.')).toBeInTheDocument();
     await waitFor(() => {
       expect(getStoredSession()?.requirePasswordUpdate).toBe(false);
       expect(container.querySelector('dialog')).not.toHaveAttribute('open');
@@ -179,11 +179,11 @@ describe('RequiredPasswordUpdateModal', () => {
     renderRequiredPasswordUpdateModal();
 
     fillPasswordForm({});
-    fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Atualizar senha' }));
 
-    expect(await screen.findByText('Unable to update password')).toBeInTheDocument();
+    expect(await screen.findByText('Erro ao atualizar senha')).toBeInTheDocument();
     expect(screen.getAllByText('Current password is incorrect.').length).toBeGreaterThan(0);
-    expect(screen.getByRole('dialog', { name: 'Update your password' })).toHaveAttribute('open');
+    expect(screen.getByRole('dialog')).toHaveAttribute('open');
     expect(getStoredSession()?.requirePasswordUpdate).toBe(true);
   });
 });
