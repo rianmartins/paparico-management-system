@@ -5,12 +5,14 @@ import { observer } from 'mobx-react-lite';
 
 import { isUnauthorizedApiError } from '@/api/errors';
 import Button from '@/components/Button';
+import Chip from '@/components/Chip';
 import Input from '@/components/Input';
 import Table, { type TableColumn } from '@/components/Table';
 import productsStore from '@/store/ProductsStore';
 import type { Product, ProductTableRow } from '@/types/Products';
 
 import styles from './ProductList.module.css';
+import SearchIcon from '@/icons/SearchIcon';
 
 type ProductListProps = {
   onEditProduct: (product: Product) => void;
@@ -19,46 +21,39 @@ type ProductListProps = {
 const productColumns = [
   {
     id: 'name',
-    header: 'Name',
+    header: 'Nome',
     accessor: 'name'
   },
   {
-    id: 'sku',
-    header: 'SKU',
-    accessor: 'sku',
+    id: 'weight_grams',
+    header: 'Tamanho',
+    accessor: 'weightGrams',
+    mobileVisibility: 'tablet'
+  },
+  {
+    id: 'variants',
+    header: 'Sabor',
+    render: (row: ProductTableRow) => (
+      <div className={styles.variantChips}>
+        {row.variants.map((flavor) => (
+          <Chip key={flavor}>{flavor}</Chip>
+        ))}
+      </div>
+    ),
     mobileVisibility: 'tablet'
   },
   {
     id: 'price',
-    header: 'Price',
+    header: 'Preço',
     accessor: 'price',
     align: 'right'
   },
   {
-    id: 'status',
+    id: 'isActive',
     header: 'Status',
-    accessor: 'status'
-  },
-  {
-    id: 'variants',
-    header: 'Variants',
-    accessor: 'variantsCount',
-    align: 'center',
-    mobileVisibility: 'tablet'
-  },
-  {
-    id: 'pickup',
-    header: 'Pickup',
-    accessor: 'allowPickup',
-    align: 'center',
-    mobileVisibility: 'desktop'
-  },
-  {
-    id: 'inhouse',
-    header: 'In-house',
-    accessor: 'allowInhouse',
-    align: 'center',
-    mobileVisibility: 'desktop'
+    render: (row: ProductTableRow) => (
+      <Chip color={row.isActive ? 'success' : 'error'}>{row.isActive ? 'Disponível' : 'Indisponível'}</Chip>
+    )
   }
 ] satisfies readonly TableColumn<ProductTableRow>[];
 
@@ -73,11 +68,6 @@ const ProductList = observer(function ProductList({ onEditProduct }: ProductList
     store.setSearchValue(event.target.value);
   }
 
-  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    store.submitSearch();
-  }
-
   function handleRowClick(row: ProductTableRow) {
     const product = store.products.find((p) => String(p.id) === row.id);
     if (product) onEditProduct(product);
@@ -85,24 +75,21 @@ const ProductList = observer(function ProductList({ onEditProduct }: ProductList
 
   return (
     <div className={styles.productList}>
-      <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
-        <Input
-          containerClassName={styles.searchInput}
-          label="Search products"
-          name="product-search"
-          onChange={handleSearchChange}
-          placeholder="Search by name or SKU"
-          value={store.searchValue}
-        />
-        <Button className={styles.searchButton} type="submit">
-          Search
-        </Button>
-      </form>
+      <Input
+        containerClassName={styles.searchInput}
+        leftIcon={<SearchIcon />}
+        name="product-search"
+        onChange={handleSearchChange}
+        placeholder="Buscar produto"
+        value={store.searchValue}
+        onSubmit={store.submitSearch}
+        variant="secondary"
+      />
 
       <Table<ProductTableRow>
         columns={productColumns}
         data={store.tableRows}
-        emptyMessage="No products available yet."
+        emptyMessage="Nenhum produto encontrado"
         isLoading={store.isLoading}
         onRowClick={handleRowClick}
         pagination={

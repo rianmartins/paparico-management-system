@@ -130,14 +130,11 @@ describe('ProductsService', () => {
     expect(selectProductsTableRows(listProductsResponseFixture([activeProductFixture]))).toEqual([
       {
         id: '1',
-        sku: 'PAP-001',
         name: 'Chocolate Cake',
-        description: 'Rich chocolate sponge cake.',
+        weightGrams: '500g',
+        variants: [],
         price: currencyFormatter.format(1299 / 100),
-        status: 'Active',
-        variantsCount: 0,
-        allowPickup: 'Yes',
-        allowInhouse: 'Yes'
+        isActive: true
       }
     ]);
   });

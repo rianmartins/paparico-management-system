@@ -83,7 +83,7 @@ describe('ProductsPage (integration)', () => {
 
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Create product' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Novo Produto' }));
 
     expect(screen.getByRole('dialog', { name: 'Create product' })).toHaveAttribute('open');
   });

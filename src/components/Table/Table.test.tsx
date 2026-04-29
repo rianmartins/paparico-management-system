@@ -126,7 +126,7 @@ describe('Table', () => {
 
     const pagination = screen.getByRole('navigation', { name: 'Table pagination' });
 
-    expect(screen.getByText('Showing 1-25 of 125')).toBeInTheDocument();
+    expect(screen.getByText('Mostrando 1-25 de 125')).toBeInTheDocument();
     expect(within(pagination).getByRole('button', { name: 'Previous page' })).toBeDisabled();
     expect(within(pagination).getByRole('button', { name: 'Page 1, current page' })).toHaveAttribute(
       'aria-current',
@@ -161,7 +161,7 @@ describe('Table', () => {
 
     const pagination = screen.getByRole('navigation', { name: 'Table pagination' });
 
-    expect(screen.getByText('Showing 76-100 of 250')).toBeInTheDocument();
+    expect(screen.getByText('Mostrando 76-100 de 250')).toBeInTheDocument();
     expect(within(pagination).getByRole('button', { name: 'Page 4, current page' })).toHaveAttribute(
       'aria-current',
       'page'

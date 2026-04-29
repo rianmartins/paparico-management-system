@@ -18,6 +18,10 @@
     min-width: 0;
   }
 
+  .newOrderButton {
+    font-size: var(--font-size-body-lg);
+  }
+
   .accountName,
   .accountEmail {
     overflow: hidden;
@@ -40,7 +44,7 @@
     border-radius: 0.75rem;
     color: var(--color-text-secondary);
     font-family: var(--font-family-heading);
-    font-size: var(--font-size-body-lg);
+    font-size: var(--font-size-body);
     font-weight: 500;
     line-height: var(--line-height-code);
   }
@@ -97,7 +101,7 @@
     background: var(--color-surface-brand-muted);
     color: var(--color-primary);
     font-family: var(--font-family-heading);
-    font-size: var(--font-size-body-xs);
+    font-size: var(--font-size-body-sm);
     font-weight: 700;
     line-height: var(--line-height-heading-tight);
   }
@@ -113,7 +117,7 @@
   .accountEmail {
     margin-top: 0.125rem;
     color: var(--color-text-subtle);
-    font-size: var(--font-size-body-2xs);
+    font-size: var(--font-size-body-xs);
     line-height: var(--line-height-label);
   }
 

@@ -28,13 +28,10 @@ export function selectProductOptions(productsResponse: ListProductsResponse): Pr
 export function selectProductsTableRows(productsResponse: ListProductsResponse): ProductTableRow[] {
   return productsResponse.data.map((product) => ({
     id: formatProductIdentifier(product.id),
-    sku: product.sku ?? 'No SKU',
     name: product.name,
-    description: product.description ?? 'No description available.',
+    weightGrams: product.weight_grams != null ? `${product.weight_grams}g` : '—',
+    variants: product.product_variants.map((v) => v.flavor),
     price: formatProductPrice(product.base_price_cents),
-    status: product.is_active ? 'Active' : 'Inactive',
-    variantsCount: product.product_variants.length,
-    allowPickup: product.allow_pickup ? 'Yes' : 'No',
-    allowInhouse: product.allow_inhouse ? 'Yes' : 'No'
+    isActive: product.is_active
   }));
 }

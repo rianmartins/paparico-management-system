@@ -19,7 +19,6 @@
   padding: 0.75rem 0.9375rem;
   border: 1px solid transparent;
   border-radius: 0.75rem;
-  background: #f3f4f6;
   color: var(--color-text-strong);
   font-size: var(--font-size-body);
   line-height: var(--line-height-form);
@@ -59,6 +58,15 @@
   &[aria-invalid='true']:focus-visible,
   &.error:focus-visible {
     box-shadow: 0 0 0 0.25rem var(--color-shadow-danger-ring);
+  }
+
+  &.primary {
+    background: #f3f4f6;
+  }
+
+  &.secondary {
+    background: var(--color-surface-brand-muted);
+    border: 1px solid var(--color-border-brand);
   }
 }
 

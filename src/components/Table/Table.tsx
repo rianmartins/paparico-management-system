@@ -72,103 +72,105 @@ export default function Table<TData>({
 
   return (
     <div className={cx(styles.TableWrapper, className)} data-testid="table-wrapper">
-      <table className={cx(styles.Table, tableClassName)}>
-        <thead>
-          <tr className={styles.headerRow}>
-            {visibleColumns.map((column) => (
-              <th
-                aria-sort={getSortAriaSort(column.id, column.sortable, activeSortState)}
-                className={cx(
-                  styles.headerCell,
-                  styles[column.align ?? 'left'],
-                  getColumnVisibilityClass(column.mobileVisibility, styles)
-                )}
-                key={column.id}
-                scope="col"
-              >
-                {column.sortable ? (
-                  <button className={styles.sortButton} onClick={() => handleSort(column)} type="button">
-                    <span>{column.header}</span>
-                    <span className={styles.sortIndicator}>
-                      {activeSortState?.columnId === column.id
-                        ? activeSortState.direction === 'asc'
-                          ? '↑'
-                          : '↓'
-                        : '↕'}
-                    </span>
-                  </button>
-                ) : (
-                  <span>{column.header}</span>
-                )}
-              </th>
-            ))}
-
-            {rowActions?.length ? (
-              <th className={cx(styles.headerCell, styles.actionsHeader)} scope="col">
-                Actions
-              </th>
-            ) : null}
-          </tr>
-        </thead>
-
-        <tbody>
-          {isLoading ? (
-            <tr>
-              <td className={styles.stateCell} colSpan={colSpan}>
-                Loading...
-              </td>
-            </tr>
-          ) : null}
-
-          {!isLoading && sortedData.length === 0 ? (
-            <tr>
-              <td className={styles.stateCell} colSpan={colSpan}>
-                {emptyMessage}
-              </td>
-            </tr>
-          ) : null}
-
-          {!isLoading
-            ? sortedData.map((row) => (
-                <tr
-                  className={cx(styles.bodyRow, onRowClick ? styles.interactiveBodyRow : undefined)}
-                  key={getRowKey(row, rowKey)}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+      <div className={styles.tableScrollArea}>
+        <table className={cx(styles.Table, tableClassName)}>
+          <thead>
+            <tr className={styles.headerRow}>
+              {visibleColumns.map((column) => (
+                <th
+                  aria-sort={getSortAriaSort(column.id, column.sortable, activeSortState)}
+                  className={cx(
+                    styles.headerCell,
+                    styles[column.align ?? 'left'],
+                    getColumnVisibilityClass(column.mobileVisibility, styles)
+                  )}
+                  key={column.id}
+                  scope="col"
                 >
-                  {visibleColumns.map((column) => (
-                    <td
-                      className={cx(
-                        styles.bodyCell,
-                        styles[column.align ?? 'left'],
-                        getColumnVisibilityClass(column.mobileVisibility, styles)
-                      )}
-                      key={column.id}
-                    >
-                      {resolveCellValue(row, column)}
-                    </td>
-                  ))}
+                  {column.sortable ? (
+                    <button className={styles.sortButton} onClick={() => handleSort(column)} type="button">
+                      <span>{column.header}</span>
+                      <span className={styles.sortIndicator}>
+                        {activeSortState?.columnId === column.id
+                          ? activeSortState.direction === 'asc'
+                            ? '↑'
+                            : '↓'
+                          : '↕'}
+                      </span>
+                    </button>
+                  ) : (
+                    <span>{column.header}</span>
+                  )}
+                </th>
+              ))}
 
-                  {rowActions?.length ? (
-                    <td className={cx(styles.bodyCell, styles.actionsCell)}>
-                      <div className={styles.actions}>
-                        {rowActions.map((action) => (
-                          <Button
-                            disabled={action.disabled?.(row) ?? false}
-                            key={String(action.label)}
-                            onClick={() => action.onClick(row)}
-                            variant={action.variant ?? 'secondary'}
-                          >
-                            {action.label}
-                          </Button>
-                        ))}
-                      </div>
-                    </td>
-                  ) : null}
-                </tr>
-              ))
-            : null}
-        </tbody>
-      </table>
+              {rowActions?.length ? (
+                <th className={cx(styles.headerCell, styles.actionsHeader)} scope="col">
+                  Actions
+                </th>
+              ) : null}
+            </tr>
+          </thead>
+
+          <tbody>
+            {isLoading ? (
+              <tr>
+                <td className={styles.stateCell} colSpan={colSpan}>
+                  Loading...
+                </td>
+              </tr>
+            ) : null}
+
+            {!isLoading && sortedData.length === 0 ? (
+              <tr>
+                <td className={styles.stateCell} colSpan={colSpan}>
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : null}
+
+            {!isLoading
+              ? sortedData.map((row) => (
+                  <tr
+                    className={cx(styles.bodyRow, onRowClick ? styles.interactiveBodyRow : undefined)}
+                    key={getRowKey(row, rowKey)}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  >
+                    {visibleColumns.map((column) => (
+                      <td
+                        className={cx(
+                          styles.bodyCell,
+                          styles[column.align ?? 'left'],
+                          getColumnVisibilityClass(column.mobileVisibility, styles)
+                        )}
+                        key={column.id}
+                      >
+                        {resolveCellValue(row, column)}
+                      </td>
+                    ))}
+
+                    {rowActions?.length ? (
+                      <td className={cx(styles.bodyCell, styles.actionsCell)}>
+                        <div className={styles.actions}>
+                          {rowActions.map((action) => (
+                            <Button
+                              disabled={action.disabled?.(row) ?? false}
+                              key={String(action.label)}
+                              onClick={() => action.onClick(row)}
+                              variant={action.variant ?? 'secondary'}
+                            >
+                              {action.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </td>
+                    ) : null}
+                  </tr>
+                ))
+              : null}
+          </tbody>
+        </table>
+      </div>
 
       {pagination ? <TableFooter disabled={isLoading} pagination={pagination} /> : null}
     </div>

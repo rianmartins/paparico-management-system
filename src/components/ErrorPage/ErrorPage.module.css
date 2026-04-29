@@ -43,7 +43,7 @@
 
 .copy h1 {
   margin: 10px 0 0;
-  font-size: var(--font-size-h1-compact);
+  font-size: var(--font-size-h1);
   line-height: var(--line-height-display);
   letter-spacing: var(--letter-spacing-display);
 }

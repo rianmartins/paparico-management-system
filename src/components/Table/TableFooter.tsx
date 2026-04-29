@@ -1,56 +1,11 @@
 import cx from 'classnames';
 
+import ChevronRightIcon from '@/icons/ChevronRightIcon';
+import ChevronLeftIcon from '@/icons/ChevronLeftIcon';
+
 import styles from './Table.module.css';
 import type { TablePaginationState } from './type';
-
-type TableFooterPageItem = number | 'ellipsis';
-
-const leadingPageCount = 3;
-
-function getTotalPages(total: number, limit: number) {
-  if (total <= 0 || limit <= 0) {
-    return 0;
-  }
-
-  return Math.ceil(total / limit);
-}
-
-function getCurrentPage(offset: number, limit: number, totalPages: number) {
-  if (limit <= 0 || totalPages <= 0) {
-    return 1;
-  }
-
-  const currentPage = Math.floor(Math.max(offset, 0) / limit) + 1;
-
-  return Math.min(Math.max(currentPage, 1), totalPages);
-}
-
-export function getTableFooterPageItems(currentPage: number, totalPages: number): TableFooterPageItem[] {
-  if (totalPages <= 0) {
-    return [];
-  }
-
-  const visiblePages = new Set<number>([currentPage, totalPages]);
-  const leadingPages = Math.min(leadingPageCount, totalPages);
-
-  for (let page = 1; page <= leadingPages; page += 1) {
-    visiblePages.add(page);
-  }
-
-  return [...visiblePages]
-    .sort((leftPage, rightPage) => leftPage - rightPage)
-    .reduce<TableFooterPageItem[]>((items, page) => {
-      const previousItem = items.at(-1);
-
-      if (typeof previousItem === 'number' && page - previousItem > 1) {
-        items.push('ellipsis');
-      }
-
-      items.push(page);
-
-      return items;
-    }, []);
-}
+import { getCurrentPage, getTableFooterPageItems, getTotalPages } from './paginationUtils';
 
 type TableFooterProps = {
   disabled?: boolean;
@@ -80,7 +35,7 @@ export default function TableFooter({ disabled = false, pagination }: TableFoote
   return (
     <div className={styles.TableFooter}>
       <p className={styles.paginationSummary}>
-        Showing {startResult}-{endResult} of {pagination.total}
+        Mostrando {startResult}-{endResult} de {pagination.total}
       </p>
 
       <nav aria-label="Table pagination" className={styles.paginationControls}>
@@ -91,7 +46,7 @@ export default function TableFooter({ disabled = false, pagination }: TableFoote
           onClick={() => handlePageSelect(currentPage - 1)}
           type="button"
         >
-          Prev
+          <ChevronLeftIcon /> Anterior
         </button>
 
         {pageItems.map((pageItem, index) =>
@@ -121,7 +76,7 @@ export default function TableFooter({ disabled = false, pagination }: TableFoote
           onClick={() => handlePageSelect(currentPage + 1)}
           type="button"
         >
-          Next
+          Próximo <ChevronRightIcon />
         </button>
       </nav>
     </div>

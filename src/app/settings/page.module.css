@@ -28,7 +28,9 @@
 
 .title {
   margin: 0;
-  font-size: var(--font-size-h1-compact);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1-default);
+  font-weight: 500;
   letter-spacing: 0;
 }
 
