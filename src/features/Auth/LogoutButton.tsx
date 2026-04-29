@@ -27,7 +27,7 @@ export default function LogoutButton({ className }: LogoutButtonProps = {}) {
 
   return (
     <Button className={className} disabled={isPending} onClick={handleLogout} type="button" variant="secondary">
-      {isPending ? 'Signing out...' : 'Sign out'}
+      {isPending ? 'Saindo...' : 'Sair'}
     </Button>
   );
 }

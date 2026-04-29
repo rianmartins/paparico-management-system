@@ -1,5 +1,5 @@
 .page {
-  --management-sidebar-width: 15rem;
+  --management-sidebar-width: 16.5rem; /* 264px */
 
   min-height: 100vh;
   background:
