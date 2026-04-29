@@ -8,11 +8,19 @@ import LogoutButton from '@/features/Auth/LogoutButton';
 import { useCurrentUserQuery } from '@/features/Auth/query';
 
 import styles from './AppSidebar.module.css';
+import Image from 'next/image';
+import Button from '@/components/Button';
+import PackageIcon from '@/icons/PackageIcon';
+import SettingsIcon from '@/icons/SettingsIcon';
 
 const navigationItems = [
-  { href: '/products', label: 'Products' },
-  { href: '/settings', label: 'Settings' }
-] as const;
+  // { href: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
+  { href: '/products', label: 'Produtos', icon: <PackageIcon /> },
+  // { href: '/orders', label: 'Pedidos', icon: <ShoppingBagIcon /> },
+  // { href: '/customers', label: 'Clientes', icon: <UsersIcon /> },
+  // { href: '/calendar', label: 'Calendário', icon: <CalendarIcon /> },
+  { href: '/settings', label: 'Configurações', icon: <SettingsIcon /> }
+];
 
 function getUserInitials(name?: string | null, email?: string) {
   const source = name?.trim() || email?.trim();
@@ -39,23 +47,26 @@ export default function AppSidebar() {
   return (
     <Sidebar aria-label="Management navigation" className={styles.sidebar} data-testid="sidebar">
       <div className={styles.sidebarBrand}>
-        <span aria-hidden="true" className={styles.sidebarBrandMark}>
-          P
-        </span>
-        <div className={styles.sidebarBrandText}>
-          <p className={styles.sidebarBrandName}>Paparico</p>
-          <p className={styles.sidebarBrandSubtitle}>Backoffice</p>
-        </div>
+        <Link href="/">
+          <Image alt="Paparico" className={styles.logo} height={64} priority src="/logo.png" width={235} />
+        </Link>
       </div>
 
+      <Button className={styles.newOrderButton} variant="primary">
+        + Novo Pedido
+      </Button>
+
       <nav aria-label="Management sections" className={styles.sidebarNavigation}>
-        {navigationItems.map(({ href, label }) => (
+        {navigationItems.map(({ href, label, icon }) => (
           <Link
             aria-current={pathname === href ? 'page' : undefined}
             className={styles.sidebarLink}
             href={href}
             key={href}
           >
+            <span aria-hidden="true" className={styles.sidebarLinkIcon}>
+              {icon}
+            </span>
             {label}
           </Link>
         ))}

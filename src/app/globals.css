@@ -25,6 +25,7 @@
   --color-text-danger-strong: #8f1b1b;
 
   /* Surfaces */
+  --color-surface-white: #fafafa;
   --color-surface-default: var(--color-background);
   --color-surface-overlay: rgba(255, 255, 255, 0.8);
   --color-surface-muted: #f4f6fb;

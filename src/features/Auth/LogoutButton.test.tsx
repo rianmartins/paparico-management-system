@@ -32,7 +32,7 @@ describe('LogoutButton', () => {
 
     render(<LogoutButton />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sair' }));
 
     await waitFor(() => {
       expect(mockedLogout).toHaveBeenCalledTimes(1);
@@ -46,10 +46,10 @@ describe('LogoutButton', () => {
 
     render(<LogoutButton />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sair' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Signing out...' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Saindo...' })).toBeDisabled();
     });
   });
 });

@@ -11,6 +11,6 @@
   overflow-x: hidden;
   overflow-y: auto;
   border-right: 1px solid var(--color-border-default);
-  background: var(--color-surface-default);
+  background: var(--color-surface-white);
   box-shadow: 0.75rem 0 2rem -1.75rem var(--color-shadow-cool-lg);
 }

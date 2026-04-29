@@ -56,37 +56,36 @@ describe('AppSidebar', () => {
 
     expect(screen.getByRole('complementary', { name: 'Management navigation' })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Management sections' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Products' })).toHaveAttribute('href', '/products');
-    expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/settings');
+    expect(screen.getByRole('link', { name: 'Produtos' })).toHaveAttribute('href', '/products');
+    expect(screen.getByRole('link', { name: 'Configurações' })).toHaveAttribute('href', '/settings');
   });
 
   it('marks Products as the current page on the products route', () => {
     renderAppSidebar('/products');
 
-    expect(screen.getByRole('link', { name: 'Products' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Settings' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Produtos' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Configurações' })).not.toHaveAttribute('aria-current');
   });
 
   it('marks Settings as the current page on the settings route', () => {
     renderAppSidebar('/settings');
 
-    expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Products' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Configurações' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Produtos' })).not.toHaveAttribute('aria-current');
   });
 
   it('does not mark a current page for unrelated routes', () => {
     renderAppSidebar('/orders');
 
-    expect(screen.getByRole('link', { name: 'Products' })).not.toHaveAttribute('aria-current');
-    expect(screen.getByRole('link', { name: 'Settings' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Produtos' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Configurações' })).not.toHaveAttribute('aria-current');
   });
 
   it('renders the brand, current user and logout action in the sidebar', async () => {
     renderAppSidebar();
 
-    expect(screen.getByText('Paparico')).toBeInTheDocument();
-    expect(screen.getByText('Backoffice')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Paparico' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Paparico Manager')).toBeInTheDocument();
