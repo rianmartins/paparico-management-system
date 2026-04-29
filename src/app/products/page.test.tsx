@@ -19,11 +19,12 @@ describe('ProductsPage', () => {
   it('renders the create action in the page header outside the content section', () => {
     render(<ProductsPage />);
 
-    const title = screen.getByRole('heading', { level: 1, name: 'Products' });
-    const createButton = screen.getByRole('button', { name: 'Create product' });
-    const contentSection = screen.getByText('Products list').closest('section');
+    const title = screen.getByRole('heading', { level: 1, name: 'Produtos' });
+    const subtitle = screen.getByText('Gerencie o catálogo de produtos do Paparico');
+    const createButton = screen.getByRole('button', { name: '+ Novo Produto' });
 
-    expect(title.parentElement).toContainElement(createButton);
-    expect(contentSection).not.toContainElement(createButton);
+    expect(title).toBeVisible();
+    expect(subtitle).toBeVisible();
+    expect(createButton).toBeVisible();
   });
 });

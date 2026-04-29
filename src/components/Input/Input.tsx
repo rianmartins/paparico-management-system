@@ -17,6 +17,8 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   inputClassName?: string;
   containerClassName?: string;
   leftIcon?: ReactNode;
+  onSubmit?: () => void;
+  variant?: 'primary' | 'secondary';
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -34,10 +36,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     leftIcon,
     required,
     type = 'text',
+    onSubmit,
+    variant = 'primary',
     ...props
   },
   ref
 ) {
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      onSubmit?.();
+    }
+  };
+
   return (
     <Field
       aria-describedby={ariaDescribedBy}
@@ -58,10 +68,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             className={cx(
               styles.Input,
               { [styles.hasIcon]: leftIcon, [styles.error]: hasError },
+              styles[variant],
               className,
               inputClassName
             )}
             id={fieldId}
+            onKeyDown={onKeyDown}
             ref={ref}
             required={required}
             type={type}

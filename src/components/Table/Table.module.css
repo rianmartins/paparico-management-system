@@ -1,10 +1,20 @@
 .TableWrapper {
   width: 100%;
-  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
   border: 1px solid var(--color-border-default);
   border-radius: 1rem;
   background: var(--color-surface-default);
   box-shadow: 0 1.5rem 3rem -2rem var(--color-shadow-cool-lg);
+}
+
+.tableScrollArea {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .Table {
@@ -13,6 +23,10 @@
   border-collapse: separate;
   border-spacing: 0;
   color: var(--color-text-strong);
+
+  tbody tr {
+    background: var(--color-surface-white);
+  }
 }
 
 .caption {
@@ -23,7 +37,7 @@
 }
 
 .headerRow {
-  background: var(--color-surface-soft);
+  background: var(--color-surface-strong);
 }
 
 .headerCell,
@@ -35,11 +49,14 @@
 }
 
 .headerCell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface-strong);
   color: var(--color-text-strong);
-  font-size: var(--font-size-body-2xs);
-  font-weight: 700;
+  font-size: var(--font-size-body);
+  font-weight: 600;
   letter-spacing: var(--letter-spacing-table);
-  text-transform: uppercase;
 }
 
 .bodyCell {
@@ -57,7 +74,7 @@
 }
 
 .interactiveBodyRow:hover {
-  background: var(--color-surface-soft);
+  background: var(--color-surface-soft-hover);
 }
 
 .stateCell {
@@ -113,14 +130,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.875rem 1rem;
+  padding: 0.5rem 1rem;
   border-top: 1px solid var(--color-border-soft);
+  flex-shrink: 0;
 }
 
 .paginationSummary {
   margin: 0;
   color: var(--color-text-secondary-muted);
-  font-size: var(--font-size-body-sm);
+  font-size: var(--font-size-body);
 }
 
 .paginationControls {
@@ -135,15 +153,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.25rem;
-  min-height: 2.25rem;
-  padding: 0.5rem 0.75rem;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding-inline: 0.5rem;
   border: 1px solid var(--color-border-default);
   border-radius: 0.5rem;
-  background: var(--color-surface-default);
+  background: var(--color-surface-soft);
   color: var(--color-text-strong);
   font: inherit;
-  font-size: var(--font-size-body-sm);
+  font-size: var(--font-size-body);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -185,7 +203,7 @@
   min-width: 2rem;
   min-height: 2.25rem;
   color: var(--color-text-secondary-muted);
-  font-size: var(--font-size-body-sm);
+  font-size: var(--font-size-body);
   font-weight: 700;
 }
 

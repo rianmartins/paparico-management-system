@@ -126,13 +126,11 @@ describe('ProductList', () => {
 
     const table = screen.getByRole('table');
 
-    expect(within(table).getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
-    expect(within(table).getByRole('columnheader', { name: 'SKU' })).toBeInTheDocument();
-    expect(within(table).getByRole('columnheader', { name: 'Price' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Nome' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Tamanho' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Sabor' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Preço' })).toBeInTheDocument();
     expect(within(table).getByRole('columnheader', { name: 'Status' })).toBeInTheDocument();
-    expect(within(table).getByRole('columnheader', { name: 'Variants' })).toBeInTheDocument();
-    expect(within(table).getByRole('columnheader', { name: 'Pickup' })).toBeInTheDocument();
-    expect(within(table).getByRole('columnheader', { name: 'In-house' })).toBeInTheDocument();
 
     const productRow = screen.getByText('Chocolate Cake').closest('tr');
 
@@ -140,11 +138,9 @@ describe('ProductList', () => {
       throw new Error('Expected product table row to render.');
     }
 
-    expect(within(productRow).getByText('PAP-001')).toBeInTheDocument();
+    expect(within(productRow).getByText('500g')).toBeInTheDocument();
     expect(within(productRow).getByText('12,99 €')).toBeInTheDocument();
-    expect(within(productRow).getByText('Active')).toBeInTheDocument();
-    expect(within(productRow).getByText('0')).toBeInTheDocument();
-    expect(within(productRow).getAllByText('Yes')).toHaveLength(2);
+    expect(within(productRow).getByText('Disponível')).toBeInTheDocument();
     expect(within(table).queryAllByRole('button')).toHaveLength(0);
   });
 
@@ -176,7 +172,7 @@ describe('ProductList', () => {
     renderProductList();
 
     await waitFor(() => {
-      expect(screen.getByText('No products available yet.')).toBeInTheDocument();
+      expect(screen.getByText('Nenhum produto encontrado')).toBeInTheDocument();
     });
   });
 
@@ -191,20 +187,24 @@ describe('ProductList', () => {
       expect(screen.getByText('Chocolate Cake')).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByRole('textbox', { name: 'Search products' }), {
+    const searchInput = screen.getByRole('textbox');
+
+    fireEvent.change(searchInput, {
       target: {
         value: ' Seasonal '
       }
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+    fireEvent.keyDown(searchInput, { key: 'Enter' });
 
     await waitFor(() => {
       expect(screen.getByText('Seasonal Tart')).toBeInTheDocument();
     });
 
     expect(screen.queryByText('Chocolate Cake')).not.toBeInTheDocument();
-    expect(screen.getByText('PAP-002')).toBeInTheDocument();
+    expect(screen.getByText('Seasonal Tart')).toBeInTheDocument();
+    expect(screen.getByText('500g')).toBeInTheDocument();
     expect(screen.getByText('15,99 €')).toBeInTheDocument();
+    expect(screen.getByText('Indisponível')).toBeInTheDocument();
     expect(mockedListProducts).toHaveBeenCalledTimes(2);
     expect(mockedListProducts).toHaveBeenNthCalledWith(1, { offset: 0, limit: 20 });
     expect(mockedListProducts).toHaveBeenNthCalledWith(2, { q: 'Seasonal', offset: 0, limit: 20 });

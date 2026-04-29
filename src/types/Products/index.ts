@@ -87,14 +87,11 @@ export type ProductOption = {
 
 export type ProductTableRow = {
   id: string;
-  sku: string;
   name: string;
-  description: string;
+  weightGrams: string;
+  variants: string[];
   price: string;
-  status: 'Active' | 'Inactive';
-  variantsCount: number;
-  allowPickup: 'Yes' | 'No';
-  allowInhouse: 'Yes' | 'No';
+  isActive: boolean;
 };
 
 export type ListProductsMeta = {

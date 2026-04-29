@@ -8,6 +8,7 @@ import ProductList from '@/features/Products/ProductList';
 import ProductsModal from '@/features/Products/ProductsModal';
 import type { Product } from '@/types/Products';
 
+import pageStyles from '../page.module.css';
 import styles from './page.module.css';
 
 export default function ProductsPage() {
@@ -31,20 +32,26 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={pageStyles.page}>
       <AppSidebar />
 
-      <div className={styles.contentShell}>
-        <main className={styles.main}>
-          <div className={styles.pageHeader}>
-            <h1 className={styles.title}>Products</h1>
-            <Button aria-haspopup="dialog" onClick={handleCreateProduct} type="button">
-              Create product
+      <div className={pageStyles.contentShell}>
+        <main className={pageStyles.main}>
+          <div className={pageStyles.pageHeader}>
+            <div>
+              <h1 className={pageStyles.title}>Produtos</h1>
+              <p className={pageStyles.subtitle}>Gerencie o catálogo de produtos do Paparico</p>
+            </div>
+            <Button
+              className={styles.newOrderButton}
+              aria-haspopup="dialog"
+              onClick={handleCreateProduct}
+              type="button"
+            >
+              + Novo Produto
             </Button>
           </div>
-          <section className={styles.content}>
-            <ProductList onEditProduct={handleEditProduct} />
-          </section>
+          <ProductList onEditProduct={handleEditProduct} />
         </main>
       </div>
 
